@@ -446,7 +446,7 @@
         // ============================================
         async function fetchFromSheets() {
             try {
-                if (DB_CONFIG.SHEET_ID === 'YOUR_SHEET_ID' || DB_CONFIG.API_KEY === 'YOUR_API_KEY') {
+                if (DB_CONFIG.SHEET_ID === 'weekly_repair_db' || DB_CONFIG.API_KEY === 'https://script.google.com/macros/s/AKfycbzgmUojaS5IHh_3UsZPUz4Lj7lrMLBU9vzhcnqtmRNbXiNlt77a7n0w2T4gZx9F5fgSvw/exec') {
                     document.getElementById('table-body').innerHTML = 
                         '<tr><td colspan="10" class="empty-state">⚠️ Please configure SHEET_ID and API_KEY in the code</td></tr>';
                     return [];
