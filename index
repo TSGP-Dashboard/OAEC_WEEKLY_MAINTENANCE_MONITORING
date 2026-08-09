@@ -18,7 +18,6 @@
             overflow-x: hidden;
         }
 
-        /* Grid Background Pattern */
         .grid-background {
             position: fixed;
             top: 0;
@@ -33,7 +32,6 @@
             z-index: 1;
         }
 
-        /* Gradient Overlay */
         .gradient-overlay {
             position: fixed;
             top: 0;
@@ -50,7 +48,6 @@
             z-index: 2;
         }
 
-        /* Navbar */
         .navbar {
             background: rgba(10, 14, 39, 0.95);
             backdrop-filter: blur(10px);
@@ -83,102 +80,6 @@
             clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 50%, 0 100%);
         }
 
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: #a0a0a0;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .nav-links a:hover {
-            color: #00ff96;
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .btn-secondary {
-            padding: 0.5rem 1.5rem;
-            background: transparent;
-            border: 1px solid rgba(0, 255, 150, 0.5);
-            color: #00ff96;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-secondary:hover {
-            border-color: #00ff96;
-            box-shadow: 0 0 10px rgba(0, 255, 150, 0.3);
-        }
-
-        .btn-primary {
-            padding: 0.5rem 1.5rem;
-            background: #00ff96;
-            border: none;
-            color: #0a0e27;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-primary:hover {
-            background: #00cc7a;
-            box-shadow: 0 0 20px rgba(0, 255, 150, 0.5);
-        }
-
-        /* Hero Section */
-        .hero {
-            text-align: center;
-            padding: 6rem 2rem;
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-            background: linear-gradient(135deg, #ffffff, #00ff96);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            font-size: 1.1rem;
-            color: #a0a0a0;
-            margin-bottom: 2rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        /* Dashboard Section */
         .dashboard-section {
             max-width: 1400px;
             margin: 0 auto;
@@ -194,7 +95,6 @@
             margin-top: 2rem;
         }
 
-        /* Sidebar */
         .sidebar {
             background: rgba(20, 25, 50, 0.8);
             border: 1px solid rgba(0, 255, 150, 0.2);
@@ -225,17 +125,15 @@
             border-left: 3px solid transparent;
         }
 
-        .sidebar-item:hover,
-        .sidebar-item.active {
+        .sidebar-item:hover {
             background: rgba(0, 255, 150, 0.2);
             border-left-color: #00ff96;
             color: #00ff96;
         }
 
-        /* Main Content */
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 2rem;
         }
 
@@ -260,6 +158,8 @@
             margin-bottom: 1.5rem;
             border-bottom: 1px solid rgba(0, 255, 150, 0.2);
             padding-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .card-title {
@@ -270,43 +170,35 @@
             color: #ffffff;
         }
 
-        .card-subtitle {
-            font-size: 12px;
-            color: #a0a0a0;
-            margin-top: 0.25rem;
-        }
-
-        .toggle-switch {
-            width: 40px;
-            height: 24px;
-            background: rgba(0, 255, 150, 0.2);
-            border: 1px solid rgba(0, 255, 150, 0.3);
-            border-radius: 12px;
-            cursor: pointer;
+        .filters {
             display: flex;
-            align-items: center;
-            padding: 2px;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .select-input {
+            padding: 0.5rem 1rem;
+            background: rgba(0, 255, 150, 0.1);
+            border: 1px solid rgba(0, 255, 150, 0.3);
+            border-radius: 4px;
+            color: #00ff96;
+            font-size: 13px;
+            cursor: pointer;
             transition: all 0.3s;
         }
 
-        .toggle-switch.active {
-            background: #00ff96;
+        .select-input:hover,
+        .select-input:focus {
+            border-color: #00ff96;
+            box-shadow: 0 0 10px rgba(0, 255, 150, 0.2);
+            outline: none;
         }
 
-        .toggle-dot {
-            width: 20px;
-            height: 20px;
-            background: rgba(20, 25, 50, 0.9);
-            border-radius: 10px;
-            transition: all 0.3s;
-        }
-
-        .toggle-switch.active .toggle-dot {
-            transform: translateX(16px);
+        .select-input option {
             background: #0a0e27;
+            color: #00ff96;
         }
 
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -336,7 +228,6 @@
             color: #a0a0a0;
         }
 
-        /* Table */
         .table-wrapper {
             overflow-x: auto;
         }
@@ -372,7 +263,6 @@
             background: rgba(0, 255, 150, 0.05);
         }
 
-        /* Status Badge */
         .status {
             display: inline-block;
             padding: 0.35rem 0.75rem;
@@ -383,102 +273,45 @@
             letter-spacing: 0.5px;
         }
 
-        .status-complete {
+        .status-done {
             background: rgba(0, 255, 150, 0.2);
             color: #00ff96;
             border: 1px solid rgba(0, 255, 150, 0.4);
         }
 
-        .status-pending {
+        .status-notdone {
             background: rgba(255, 180, 0, 0.2);
             color: #ffb400;
             border: 1px solid rgba(255, 180, 0, 0.4);
         }
 
-        .status-inprogress {
-            background: rgba(100, 200, 255, 0.2);
-            color: #64c8ff;
-            border: 1px solid rgba(100, 200, 255, 0.4);
-        }
-
-        /* Chart */
-        .chart-container {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-around;
-            height: 200px;
-            gap: 1rem;
-        }
-
-        .chart-bar {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .bar {
-            background: linear-gradient(180deg, #00ff96, #00cc7a);
+        .btn-export {
+            padding: 0.5rem 1.5rem;
+            background: linear-gradient(135deg, #00ff96, #00cc7a);
+            border: none;
+            color: #0a0e27;
             border-radius: 4px;
-            width: 40px;
-            min-height: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
             transition: all 0.3s;
-            box-shadow: 0 0 10px rgba(0, 255, 150, 0.3);
         }
 
-        .bar:hover {
-            box-shadow: 0 0 20px rgba(0, 255, 150, 0.6);
+        .btn-export:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 150, 0.5);
+            transform: translateY(-2px);
         }
 
-        .bar-label {
-            font-size: 12px;
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
             color: #a0a0a0;
         }
 
-        /* Modal/Filter */
-        .filter-section {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            align-items: center;
-        }
-
-        .select-input {
-            padding: 0.5rem 1rem;
-            background: rgba(0, 255, 150, 0.1);
-            border: 1px solid rgba(0, 255, 150, 0.3);
-            border-radius: 4px;
-            color: #00ff96;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .select-input:hover,
-        .select-input:focus {
-            border-color: #00ff96;
-            box-shadow: 0 0 10px rgba(0, 255, 150, 0.2);
-            outline: none;
-        }
-
-        .select-input option {
-            background: #0a0e27;
-            color: #00ff96;
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .hero h1 {
-                font-size: 2.5rem;
-            }
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #a0a0a0;
         }
 
         @media (max-width: 768px) {
@@ -486,40 +319,22 @@
                 grid-template-columns: 1fr;
             }
 
-            .nav-links {
-                gap: 1rem;
-                font-size: 12px;
-            }
-
-            .hero h1 {
-                font-size: 2rem;
-            }
-
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .navbar {
+            .card-header {
                 flex-direction: column;
-                gap: 1rem;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .hero {
-                padding: 3rem 1rem;
+                align-items: flex-start;
             }
 
-            .hero h1 {
-                font-size: 1.8rem;
+            .filters {
+                width: 100%;
             }
 
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                display: none;
+            .select-input {
+                flex: 1;
+                min-width: 150px;
             }
         }
     </style>
@@ -532,163 +347,70 @@
         <!-- Navbar -->
         <nav class="navbar">
             <div class="logo">Repair Hub</div>
-            <div class="nav-links">
-                <a href="#home">Home</a>
-                <a href="#repairs">Repairs</a>
-                <a href="#reports">Reports</a>
-                <a href="#settings">Settings</a>
-            </div>
-            <div class="nav-buttons">
-                <button class="btn-secondary">Login</button>
-                <button class="btn-primary">Sign up</button>
-            </div>
         </nav>
-
-        <!-- Hero Section -->
-        <section class="hero">
-            <h1>Manage repairs efficiently.<br>Track everything in one place.</h1>
-            <p>Organize tasks, track progress, and keep every repair on schedule. Keep your team aligned, informed, and moving forward.</p>
-            <div class="hero-buttons">
-                <button class="btn-primary">Get Started</button>
-                <button class="btn-secondary">View Demo</button>
-            </div>
-        </section>
 
         <!-- Dashboard Section -->
         <section class="dashboard-section">
             <div class="dashboard-grid">
                 <!-- Sidebar -->
                 <div class="sidebar">
-                    <div class="sidebar-title">Dashboard</div>
-                    <div class="sidebar-item active">Overview</div>
-                    <div class="sidebar-item">Today's Tasks</div>
-                    <div class="sidebar-item">This Week</div>
-                    <div class="sidebar-item">Pending</div>
-                    <div class="sidebar-item">Completed</div>
-                    <div class="sidebar-item">Reports</div>
-                    <hr style="border: none; border-top: 1px solid rgba(0, 255, 150, 0.1); margin: 1rem 0;">
-                    <div class="sidebar-title" style="margin-top: 1rem;">Locations</div>
-                    <div class="sidebar-item">Zone A</div>
-                    <div class="sidebar-item">Zone B</div>
-                    <div class="sidebar-item">Zone C</div>
+                    <div class="sidebar-title">Quick Stats</div>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem;">
+                        <div style="padding: 0.75rem; background: rgba(0, 255, 150, 0.1); border-radius: 4px;">
+                            <div style="font-size: 20px; font-weight: 700; color: #00ff96;" id="quick-total">0</div>
+                            <div style="font-size: 11px; color: #a0a0a0; margin-top: 0.5rem;">Total</div>
+                        </div>
+                        <div style="padding: 0.75rem; background: rgba(0, 255, 150, 0.1); border-radius: 4px;">
+                            <div style="font-size: 20px; font-weight: 700; color: #00ff96;" id="quick-done">0</div>
+                            <div style="font-size: 11px; color: #a0a0a0; margin-top: 0.5rem;">Completed</div>
+                        </div>
+                        <div style="padding: 0.75rem; background: rgba(255, 180, 0, 0.1); border-radius: 4px;">
+                            <div style="font-size: 20px; font-weight: 700; color: #ffb400;" id="quick-notdone">0</div>
+                            <div style="font-size: 11px; color: #a0a0a0; margin-top: 0.5rem;">Pending</div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Main Content -->
                 <div>
-                    <!-- Stats Grid -->
-                    <div class="stats-grid">
-                        <div class="stat-box">
-                            <div class="stat-number" id="stat-total">0</div>
-                            <div class="stat-label">Total</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-number" id="stat-complete">0</div>
-                            <div class="stat-label">Completed</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-number" id="stat-progress">0</div>
-                            <div class="stat-label">In Progress</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-number" id="stat-pending">0</div>
-                            <div class="stat-label">Pending</div>
-                        </div>
-                    </div>
-
-                    <!-- Cards Row -->
-                    <div class="main-content">
-                        <!-- Repairs Table Card -->
-                        <div class="card" style="grid-column: 1 / -1;">
-                            <div class="card-header">
-                                <div>
-                                    <div class="card-title">Weekly Repairs</div>
-                                    <div class="card-subtitle">This week's scheduled repairs</div>
-                                </div>
-                                <div style="display: flex; gap: 1rem; align-items: center;">
-                                    <select class="select-input" id="week-filter">
-                                        <option>Select week</option>
-                                    </select>
-                                    <div class="toggle-switch active">
-                                        <div class="toggle-dot"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="filter-section">
-                                <input type="text" id="today-date" readonly style="padding: 0.5rem; background: rgba(0, 255, 150, 0.1); border: 1px solid rgba(0, 255, 150, 0.3); border-radius: 4px; color: #00ff96; font-size: 12px;">
-                            </div>
-                            <div class="table-wrapper">
-                                <table id="repair-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Unit No</th>
-                                            <th>Repair Type</th>
-                                            <th>Duration</th>
-                                            <th>Location</th>
-                                            <th>Status</th>
-                                            <th>Remarks</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="table-body">
-                                        <tr><td colspan="6" style="text-align: center; padding: 2rem;">Loading data...</td></tr>
-                                    </tbody>
-                                </table>
+                    <!-- Repairs Table Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Weekly Repairs</div>
+                            <div class="filters">
+                                <select class="select-input" id="week-filter">
+                                    <option value="">All Weeks</option>
+                                </select>
+                                <select class="select-input" id="location-filter">
+                                    <option value="">All Locations</option>
+                                </select>
+                                <select class="select-input" id="status-filter">
+                                    <option value="">All Status</option>
+                                </select>
+                                <button class="btn-export" onclick="exportCurrentData()">Export CSV</button>
                             </div>
                         </div>
 
-                        <!-- Performance Card -->
-                        <div class="card">
-                            <div class="card-header">
-                                <div>
-                                    <div class="card-title">Performance</div>
-                                    <div class="card-subtitle">Completion rate</div>
-                                </div>
-                            </div>
-                            <div class="chart-container">
-                                <div class="chart-bar">
-                                    <div class="bar" style="height: 80%;"></div>
-                                    <span class="bar-label">Mon</span>
-                                </div>
-                                <div class="chart-bar">
-                                    <div class="bar" style="height: 60%;"></div>
-                                    <span class="bar-label">Tue</span>
-                                </div>
-                                <div class="chart-bar">
-                                    <div class="bar" style="height: 90%;"></div>
-                                    <span class="bar-label">Wed</span>
-                                </div>
-                                <div class="chart-bar">
-                                    <div class="bar" style="height: 70%;"></div>
-                                    <span class="bar-label">Thu</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Tasks Card -->
-                        <div class="card">
-                            <div class="card-header">
-                                <div>
-                                    <div class="card-title">Today's Tasks</div>
-                                    <div class="card-subtitle">4 repairs scheduled</div>
-                                </div>
-                            </div>
-                            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(0, 255, 150, 0.08); border-radius: 4px; border-left: 3px solid #00ff96;">
-                                    <span>Fix pump in Unit A</span>
-                                    <span class="status status-inprogress">In Progress</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(0, 255, 150, 0.08); border-radius: 4px; border-left: 3px solid #00ff96;">
-                                    <span>Replace valve in Unit B</span>
-                                    <span class="status status-pending">Pending</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(0, 255, 150, 0.08); border-radius: 4px; border-left: 3px solid #00cc7a;">
-                                    <span>Inspect wiring in Unit C</span>
-                                    <span class="status status-complete">Complete</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(0, 255, 150, 0.08); border-radius: 4px; border-left: 3px solid #00ff96;">
-                                    <span>Calibrate sensors</span>
-                                    <span class="status status-pending">Pending</span>
-                                </div>
-                            </div>
+                        <div class="table-wrapper">
+                            <table id="repair-table">
+                                <thead>
+                                    <tr>
+                                        <th>Unit No</th>
+                                        <th>Week</th>
+                                        <th>Date Start</th>
+                                        <th>Date End</th>
+                                        <th>Repair Type</th>
+                                        <th>Activity</th>
+                                        <th>Location</th>
+                                        <th>Duration</th>
+                                        <th>Status</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body">
+                                    <tr><td colspan="10" class="loading">Loading data...</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -697,170 +419,254 @@
     </div>
 
     <script>
-        // Configuration
-        const SHEET_ID = 'weekly_repair_db';
-        const API_KEY = 'https://script.google.com/macros/s/AKfycbzgmUojaS5IHh_3UsZPUz4Lj7lrMLBU9vzhcnqtmRNbXiNlt77a7n0w2T4gZx9F5fgSvw/exec';
-        const SHEET_NAME = 'Sheet1';
+        // ============================================
+        // DATABASE CONFIGURATION
+        // ============================================
+        const DB_CONFIG = {
+            SHEET_ID: 'YOUR_SHEET_ID',
+            API_KEY: 'YOUR_API_KEY',
+            SHEET_NAME: 'Sheet1'
+        };
 
-        // Utility Functions
-        function getToday() {
-            return new Date();
-        }
+        const COLUMN_MAP = {
+            UNIT_NO: 0,
+            WEEK: 1,
+            DATE_START: 2,
+            DATE_END: 3,
+            REPAIR_TYPE: 4,
+            ACTIVITY: 5,
+            LOCATION: 7,
+            DURATION: 8,
+            STATUS: 9,
+            REMARKS: 10
+        };
 
-        function getWeekNumber(date) {
-            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-            const dayNum = d.getUTCDay() || 7;
-            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-        }
-
-        function getWeekRange(date) {
-            const day = date.getDay();
-            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-            const saturday = new Date(date.setDate(diff - 1));
-            const friday = new Date(saturday);
-            friday.setDate(friday.getDate() + 6);
-            return { saturday, friday };
-        }
-
-        function formatDate(date) {
-            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-        }
-
-        function getStatusBadge(status) {
-            const statusLower = (status || '').toLowerCase().trim();
-            if (statusLower === 'complete' || statusLower === 'completed') {
-                return '<span class="status status-complete">Complete</span>';
-            } else if (statusLower === 'in progress' || statusLower === 'inprogress') {
-                return '<span class="status status-inprogress">In Progress</span>';
-            } else if (statusLower === 'pending') {
-                return '<span class="status status-pending">Pending</span>';
-            }
-            return `<span>${status || '-'}</span>`;
-        }
-
-        // Display today's date
-        function displayToday() {
-            const today = getToday();
-            const weekRange = getWeekRange(new Date(today));
-            document.getElementById('today-date').value = 
-                `Today: ${formatDate(today)} (Week ${getWeekNumber(today)}, ${formatDate(weekRange.saturday)} - ${formatDate(weekRange.friday)})`;
-        }
-
-        // Fetch data
-        async function fetchRepairData() {
+        // ============================================
+        // FETCH & PARSE
+        // ============================================
+        async function fetchFromSheets() {
             try {
-                if (SHEET_ID === 'YOUR_SHEET_ID' || API_KEY === 'YOUR_API_KEY') {
-                    console.warn('Please configure Sheet ID and API Key');
+                if (DB_CONFIG.SHEET_ID === 'YOUR_SHEET_ID' || DB_CONFIG.API_KEY === 'YOUR_API_KEY') {
+                    document.getElementById('table-body').innerHTML = 
+                        '<tr><td colspan="10" class="empty-state">⚠️ Please configure SHEET_ID and API_KEY in the code</td></tr>';
                     return [];
                 }
 
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${DB_CONFIG.SHEET_ID}/values/${DB_CONFIG.SHEET_NAME}?key=${DB_CONFIG.API_KEY}`;
                 const response = await fetch(url);
 
-                if (!response.ok) throw new Error('Failed to fetch');
+                if (!response.ok) throw new Error(`API Error: ${response.status}`);
 
                 const data = await response.json();
                 return data.values || [];
             } catch (error) {
                 console.error('Error:', error);
+                document.getElementById('table-body').innerHTML = 
+                    '<tr><td colspan="10" class="empty-state">❌ Error loading data</td></tr>';
                 return [];
             }
         }
 
-        function populateWeekFilter(rows) {
-            const weeks = new Set();
-            rows.forEach((row, idx) => {
-                if (idx === 0) return;
-                const dateStr = row[2];
-                if (dateStr) {
-                    try {
-                        const date = new Date(dateStr);
-                        weeks.add(getWeekNumber(date));
-                    } catch (e) {}
+        function parseRow(row) {
+            if (!row || row.length < 11) return null;
+
+            return {
+                unitNo: row[COLUMN_MAP.UNIT_NO] || '',
+                week: row[COLUMN_MAP.WEEK] || '',
+                dateStart: row[COLUMN_MAP.DATE_START] || '',
+                dateEnd: row[COLUMN_MAP.DATE_END] || '',
+                repairType: row[COLUMN_MAP.REPAIR_TYPE] || '',
+                activity: row[COLUMN_MAP.ACTIVITY] || '',
+                location: row[COLUMN_MAP.LOCATION] || '',
+                duration: row[COLUMN_MAP.DURATION] || '',
+                status: row[COLUMN_MAP.STATUS] || '',
+                remarks: row[COLUMN_MAP.REMARKS] || ''
+            };
+        }
+
+        // ============================================
+        // FILTER & SORT
+        // ============================================
+        function filterRows(rows, filters = {}) {
+            let filtered = rows;
+
+            if (filters.week) {
+                filtered = filtered.filter(row => {
+                    const parsed = parseRow(row);
+                    return parsed && parsed.week == filters.week;
+                });
+            }
+
+            if (filters.location) {
+                filtered = filtered.filter(row => {
+                    const parsed = parseRow(row);
+                    return parsed && parsed.location === filters.location;
+                });
+            }
+
+            if (filters.status) {
+                filtered = filtered.filter(row => {
+                    const parsed = parseRow(row);
+                    return parsed && parsed.status === filters.status;
+                });
+            }
+
+            return filtered;
+        }
+
+        function getUniqueValues(rows, columnMap) {
+            const values = new Set();
+            rows.forEach(row => {
+                const parsed = parseRow(row);
+                if (parsed && parsed[columnMap]) {
+                    values.add(parsed[columnMap]);
+                }
+            });
+            return Array.from(values).sort();
+        }
+
+        // ============================================
+        // UI FUNCTIONS
+        // ============================================
+        function populateFilters(rows) {
+            const weeks = getUniqueValues(rows, 'week');
+            const locations = getUniqueValues(rows, 'location');
+            const statuses = getUniqueValues(rows, 'status');
+
+            populateSelect('week-filter', weeks);
+            populateSelect('location-filter', locations);
+            populateSelect('status-filter', statuses);
+        }
+
+        function populateSelect(selectId, values) {
+            const select = document.getElementById(selectId);
+            const currentValue = select.value;
+
+            values.forEach(value => {
+                if (!select.querySelector(`option[value="${value}"]`)) {
+                    const option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    select.appendChild(option);
                 }
             });
 
-            const selectEl = document.getElementById('week-filter');
-            Array.from(weeks)
-                .sort((a, b) => b - a)
-                .forEach(week => {
-                    const option = document.createElement('option');
-                    option.value = week;
-                    option.textContent = `Week ${week}`;
-                    selectEl.appendChild(option);
-                });
-
-            const currentWeek = getWeekNumber(getToday());
-            selectEl.value = currentWeek;
+            select.value = currentValue;
         }
 
-        function renderTable(rows, selectedWeek) {
+        function renderTable(rows, filters = {}) {
+            const filtered = filterRows(rows, filters);
             const tbody = document.getElementById('table-body');
-            const filtered = rows
-                .slice(1)
-                .filter(row => {
-                    if (!selectedWeek) return true;
-                    const dateStr = row[2];
-                    return dateStr ? getWeekNumber(new Date(dateStr)) == selectedWeek : false;
-                });
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">No repairs scheduled</td></tr>';
-                updateStats(rows, selectedWeek);
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No repairs found matching your filters</td></tr>';
+                updateStats(rows, filters);
                 return;
             }
 
-            const tableBody = filtered.map(row => {
-                const [unitNo, repairType, date, duration, location, status, remarks] = row;
+            const html = filtered.map(row => {
+                const parsed = parseRow(row);
+                if (!parsed) return '';
+
+                const statusClass = parsed.status.toLowerCase() === 'done' ? 'status-done' : 'status-notdone';
                 return `
                     <tr>
-                        <td>${unitNo || '-'}</td>
-                        <td>${repairType || '-'}</td>
-                        <td>${duration || '-'}</td>
-                        <td>${location || '-'}</td>
-                        <td>${getStatusBadge(status)}</td>
-                        <td>${remarks || '-'}</td>
+                        <td>${parsed.unitNo}</td>
+                        <td>${parsed.week}</td>
+                        <td>${parsed.dateStart}</td>
+                        <td>${parsed.dateEnd}</td>
+                        <td>${parsed.repairType}</td>
+                        <td>${parsed.activity}</td>
+                        <td>${parsed.location}</td>
+                        <td>${parsed.duration}</td>
+                        <td><span class="status ${statusClass}">${parsed.status}</span></td>
+                        <td>${parsed.remarks}</td>
                     </tr>
                 `;
-            });
+            }).join('');
 
-            tbody.innerHTML = tableBody.join('');
-            updateStats(rows, selectedWeek);
+            tbody.innerHTML = html;
+            updateStats(rows, filters);
         }
 
-        function updateStats(rows, selectedWeek) {
-            const filtered = rows.slice(1).filter(row => {
-                if (!selectedWeek) return true;
-                const dateStr = row[2];
-                return dateStr ? getWeekNumber(new Date(dateStr)) == selectedWeek : false;
-            });
+        function updateStats(allRows, filters = {}) {
+            const filtered = filterRows(allRows.slice(1), filters);
+            const parsed = filtered.map(parseRow).filter(Boolean);
 
-            const total = filtered.length;
-            const completed = filtered.filter(r => (r[5] || '').toLowerCase().includes('complete')).length;
-            const inProgress = filtered.filter(r => (r[5] || '').toLowerCase().includes('progress')).length;
-            const pending = filtered.filter(r => (r[5] || '').toLowerCase().includes('pending')).length;
+            const total = parsed.length;
+            const done = parsed.filter(r => r.status.toLowerCase() === 'done').length;
+            const notDone = parsed.filter(r => r.status.toLowerCase() === 'not done').length;
 
-            document.getElementById('stat-total').textContent = total;
-            document.getElementById('stat-complete').textContent = completed;
-            document.getElementById('stat-progress').textContent = inProgress;
-            document.getElementById('stat-pending').textContent = pending;
+            document.getElementById('quick-total').textContent = total;
+            document.getElementById('quick-done').textContent = done;
+            document.getElementById('quick-notdone').textContent = notDone;
         }
 
-        // Initialize
+        function getFilters() {
+            return {
+                week: document.getElementById('week-filter').value,
+                location: document.getElementById('location-filter').value,
+                status: document.getElementById('status-filter').value
+            };
+        }
+
+        function exportCurrentData() {
+            const rows = globalRows;
+            const filters = getFilters();
+            const filtered = filterRows(rows.slice(1), filters);
+
+            const headers = ['Unit No', 'Week', 'Date Start', 'Date End', 'Repair Type', 'Activity', 'Location', 'Duration', 'Status', 'Remarks'];
+            const csvContent = [
+                headers.join(','),
+                ...filtered.map(row => {
+                    const parsed = parseRow(row);
+                    if (!parsed) return '';
+                    return [
+                        parsed.unitNo,
+                        parsed.week,
+                        parsed.dateStart,
+                        parsed.dateEnd,
+                        parsed.repairType,
+                        parsed.activity,
+                        parsed.location,
+                        parsed.duration,
+                        parsed.status,
+                        parsed.remarks
+                    ].map(v => `"${v}"`).join(',');
+                })
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `repairs_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        // ============================================
+        // INITIALIZE
+        // ============================================
+        let globalRows = [];
+
         async function init() {
-            displayToday();
-            const rows = await fetchRepairData();
+            globalRows = await fetchFromSheets();
 
-            if (rows.length > 1) {
-                populateWeekFilter(rows);
-                const currentWeek = getWeekNumber(getToday());
-                renderTable(rows, currentWeek);
+            if (globalRows.length > 1) {
+                populateFilters(globalRows.slice(1));
+                renderTable(globalRows.slice(1));
 
-                document.getElementById('week-filter').addEventListener('change', (e) => {
-                    const selectedWeek = e.target.value ? parseInt(e.target.value) : null;
-                    renderTable(rows, selectedWeek);
+                // Add filter listeners
+                document.getElementById('week-filter').addEventListener('change', () => {
+                    renderTable(globalRows.slice(1), getFilters());
+                });
+
+                document.getElementById('location-filter').addEventListener('change', () => {
+                    renderTable(globalRows.slice(1), getFilters());
+                });
+
+                document.getElementById('status-filter').addEventListener('change', () => {
+                    renderTable(globalRows.slice(1), getFilters());
                 });
             }
         }
