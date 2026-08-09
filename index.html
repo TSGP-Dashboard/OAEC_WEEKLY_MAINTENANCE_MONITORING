@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Repair Management System</title>
+    <title>Repair Management Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -65,19 +65,11 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: #00ff96;
             text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .logo::before {
-            content: '';
-            width: 30px;
-            height: 30px;
-            background: linear-gradient(135deg, #00ff96, #00cc7a);
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 50%, 0 100%);
+            letter-spacing: 1px;
         }
 
         .dashboard-section {
@@ -88,67 +80,13 @@
             z-index: 2;
         }
 
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .sidebar {
-            background: rgba(20, 25, 50, 0.8);
-            border: 1px solid rgba(0, 255, 150, 0.2);
-            border-radius: 8px;
-            padding: 1.5rem;
-            backdrop-filter: blur(10px);
-            height: fit-content;
-        }
-
-        .sidebar-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #00ff96;
-            margin-bottom: 1rem;
-            font-weight: 700;
-        }
-
-        .sidebar-item {
-            padding: 0.75rem 1rem;
-            margin-bottom: 0.5rem;
-            background: rgba(0, 255, 150, 0.1);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 13px;
-            color: #a0a0a0;
-            border-left: 3px solid transparent;
-        }
-
-        .sidebar-item:hover {
-            background: rgba(0, 255, 150, 0.2);
-            border-left-color: #00ff96;
-            color: #00ff96;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-        }
-
         .card {
             background: rgba(20, 25, 50, 0.8);
             border: 1px solid rgba(0, 255, 150, 0.2);
             border-radius: 8px;
             padding: 2rem;
             backdrop-filter: blur(10px);
-            transition: all 0.3s;
-        }
-
-        .card:hover {
-            border-color: rgba(0, 255, 150, 0.5);
-            box-shadow: 0 0 20px rgba(0, 255, 150, 0.1);
+            margin-bottom: 2rem;
         }
 
         .card-header {
@@ -163,7 +101,7 @@
         }
 
         .card-title {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -174,10 +112,11 @@
             display: flex;
             gap: 1rem;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .select-input {
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1rem;
             background: rgba(0, 255, 150, 0.1);
             border: 1px solid rgba(0, 255, 150, 0.3);
             border-radius: 4px;
@@ -199,9 +138,26 @@
             color: #00ff96;
         }
 
+        .btn {
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(135deg, #00ff96, #00cc7a);
+            border: none;
+            color: #0a0e27;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 150, 0.5);
+            transform: translateY(-2px);
+        }
+
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
             margin-bottom: 2rem;
         }
@@ -222,7 +178,7 @@
         }
 
         .stat-label {
-            font-size: 11px;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #a0a0a0;
@@ -265,7 +221,7 @@
 
         .status {
             display: inline-block;
-            padding: 0.35rem 0.75rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 4px;
             font-size: 11px;
             font-weight: 600;
@@ -285,23 +241,6 @@
             border: 1px solid rgba(255, 180, 0, 0.4);
         }
 
-        .btn-export {
-            padding: 0.5rem 1.5rem;
-            background: linear-gradient(135deg, #00ff96, #00cc7a);
-            border: none;
-            color: #0a0e27;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-export:hover {
-            box-shadow: 0 0 20px rgba(0, 255, 150, 0.5);
-            transform: translateY(-2px);
-        }
-
         .empty-state {
             text-align: center;
             padding: 3rem;
@@ -315,14 +254,6 @@
         }
 
         @media (max-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
             .card-header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -334,7 +265,15 @@
 
             .select-input {
                 flex: 1;
-                min-width: 150px;
+                min-width: 120px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 0.7rem;
             }
         }
     </style>
@@ -346,73 +285,69 @@
     <div class="container">
         <!-- Navbar -->
         <nav class="navbar">
-            <div class="logo">Repair Hub</div>
+            <div class="logo">🔧 Repair Hub</div>
         </nav>
 
         <!-- Dashboard Section -->
         <section class="dashboard-section">
-            <div class="dashboard-grid">
-                <!-- Sidebar -->
-                <div class="sidebar">
-                    <div class="sidebar-title">Quick Stats</div>
-                    <div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem;">
-                        <div style="padding: 0.75rem; background: rgba(0, 255, 150, 0.1); border-radius: 4px;">
-                            <div style="font-size: 20px; font-weight: 700; color: #00ff96;" id="quick-total">0</div>
-                            <div style="font-size: 11px; color: #a0a0a0; margin-top: 0.5rem;">Total</div>
-                        </div>
-                        <div style="padding: 0.75rem; background: rgba(0, 255, 150, 0.1); border-radius: 4px;">
-                            <div style="font-size: 20px; font-weight: 700; color: #00ff96;" id="quick-done">0</div>
-                            <div style="font-size: 11px; color: #a0a0a0; margin-top: 0.5rem;">Completed</div>
-                        </div>
-                        <div style="padding: 0.75rem; background: rgba(255, 180, 0, 0.1); border-radius: 4px;">
-                            <div style="font-size: 20px; font-weight: 700; color: #ffb400;" id="quick-notdone">0</div>
-                            <div style="font-size: 11px; color: #a0a0a0; margin-top: 0.5rem;">Pending</div>
-                        </div>
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-number" id="stat-total">0</div>
+                    <div class="stat-label">Total Repairs</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="stat-done">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="stat-notdone">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="stat-locations">0</div>
+                    <div class="stat-label">Locations</div>
+                </div>
+            </div>
+
+            <!-- Repairs Table Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Weekly Repairs</div>
+                    <div class="filters">
+                        <select class="select-input" id="week-filter">
+                            <option value="">All Weeks</option>
+                        </select>
+                        <select class="select-input" id="location-filter">
+                            <option value="">All Locations</option>
+                        </select>
+                        <select class="select-input" id="status-filter">
+                            <option value="">All Status</option>
+                        </select>
+                        <button class="btn" onclick="exportData()">Export CSV</button>
                     </div>
                 </div>
 
-                <!-- Main Content -->
-                <div>
-                    <!-- Repairs Table Card -->
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">Weekly Repairs</div>
-                            <div class="filters">
-                                <select class="select-input" id="week-filter">
-                                    <option value="">All Weeks</option>
-                                </select>
-                                <select class="select-input" id="location-filter">
-                                    <option value="">All Locations</option>
-                                </select>
-                                <select class="select-input" id="status-filter">
-                                    <option value="">All Status</option>
-                                </select>
-                                <button class="btn-export" onclick="exportCurrentData()">Export CSV</button>
-                            </div>
-                        </div>
-
-                        <div class="table-wrapper">
-                            <table id="repair-table">
-                                <thead>
-                                    <tr>
-                                        <th>Unit No</th>
-                                        <th>Week</th>
-                                        <th>Date Start</th>
-                                        <th>Date End</th>
-                                        <th>Repair Type</th>
-                                        <th>Activity</th>
-                                        <th>Location</th>
-                                        <th>Duration</th>
-                                        <th>Status</th>
-                                        <th>Remarks</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-body">
-                                    <tr><td colspan="10" class="loading">Loading data...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div class="table-wrapper">
+                    <table id="repair-table">
+                        <thead>
+                            <tr>
+                                <th>Unit No</th>
+                                <th>Week</th>
+                                <th>Date Start</th>
+                                <th>Date End</th>
+                                <th>Repair Type</th>
+                                <th>Activity</th>
+                                <th>Location</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <tr><td colspan="10" class="loading">Loading data...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
@@ -424,7 +359,7 @@
         // ============================================
         const DB_CONFIG = {
             SHEET_ID: 'weekly_repair_db',
-            API_KEY: 'https://script.google.com/macros/s/AKfycbzgmUojaS5IHh_3UsZPUz4Lj7lrMLBU9vzhcnqtmRNbXiNlt77a7n0w2T4gZx9F5fgSvw/exec',
+            API_KEY: 'https://script.google.com/macros/s/AKfycbxbVXtnx4ocnmwPTP_6S3IMBF-McOij5PPfzgExiaVvUEy8wKeM3lN5_9a64gVnIcvgQw/exec',
             SHEET_NAME: 'Sheet1'
         };
 
@@ -442,13 +377,12 @@
         };
 
         // ============================================
-        // FETCH & PARSE
+        // FETCH DATA
         // ============================================
         async function fetchFromSheets() {
             try {
                 if (DB_CONFIG.SHEET_ID === 'YOUR_SHEET_ID' || DB_CONFIG.API_KEY === 'YOUR_API_KEY') {
-                    document.getElementById('table-body').innerHTML = 
-                        '<tr><td colspan="10" class="empty-state">⚠️ Please configure SHEET_ID and API_KEY in the code</td></tr>';
+                    showError('⚠️ Please configure SHEET_ID and API_KEY in the code');
                     return [];
                 }
 
@@ -461,12 +395,14 @@
                 return data.values || [];
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('table-body').innerHTML = 
-                    '<tr><td colspan="10" class="empty-state">❌ Error loading data</td></tr>';
+                showError('❌ Error loading data. Check your configuration.');
                 return [];
             }
         }
 
+        // ============================================
+        // PARSE & FILTER
+        // ============================================
         function parseRow(row) {
             if (!row || row.length < 11) return null;
 
@@ -484,16 +420,13 @@
             };
         }
 
-        // ============================================
-        // FILTER & SORT
-        // ============================================
         function filterRows(rows, filters = {}) {
             let filtered = rows;
 
             if (filters.week) {
                 filtered = filtered.filter(row => {
                     const parsed = parseRow(row);
-                    return parsed && parsed.week == filters.week;
+                    return parsed && String(parsed.week) === String(filters.week);
                 });
             }
 
@@ -514,12 +447,15 @@
             return filtered;
         }
 
-        function getUniqueValues(rows, columnMap) {
+        // ============================================
+        // GET UNIQUE VALUES FOR FILTERS
+        // ============================================
+        function getUniqueValues(rows, key) {
             const values = new Set();
             rows.forEach(row => {
                 const parsed = parseRow(row);
-                if (parsed && parsed[columnMap]) {
-                    values.add(parsed[columnMap]);
+                if (parsed && parsed[key]) {
+                    values.add(parsed[key]);
                 }
             });
             return Array.from(values).sort();
@@ -552,6 +488,14 @@
             });
 
             select.value = currentValue;
+        }
+
+        function getFilters() {
+            return {
+                week: document.getElementById('week-filter').value,
+                location: document.getElementById('location-filter').value,
+                status: document.getElementById('status-filter').value
+            };
         }
 
         function renderTable(rows, filters = {}) {
@@ -591,26 +535,28 @@
 
         function updateStats(allRows, filters = {}) {
             const filtered = filterRows(allRows.slice(1), filters);
-            const parsed = filtered.map(parseRow).filter(Boolean);
+            const parsed = filtered.map(parseRow).filter(r => r !== null);
 
             const total = parsed.length;
             const done = parsed.filter(r => r.status.toLowerCase() === 'done').length;
             const notDone = parsed.filter(r => r.status.toLowerCase() === 'not done').length;
+            const locations = new Set(parsed.map(r => r.location)).size;
 
-            document.getElementById('quick-total').textContent = total;
-            document.getElementById('quick-done').textContent = done;
-            document.getElementById('quick-notdone').textContent = notDone;
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-done').textContent = done;
+            document.getElementById('stat-notdone').textContent = notDone;
+            document.getElementById('stat-locations').textContent = locations;
         }
 
-        function getFilters() {
-            return {
-                week: document.getElementById('week-filter').value,
-                location: document.getElementById('location-filter').value,
-                status: document.getElementById('status-filter').value
-            };
+        function showError(message) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = `<tr><td colspan="10" class="empty-state">${message}</td></tr>`;
         }
 
-        function exportCurrentData() {
+        // ============================================
+        // EXPORT TO CSV
+        // ============================================
+        function exportData() {
             const rows = globalRows;
             const filters = getFilters();
             const filtered = filterRows(rows.slice(1), filters);
@@ -657,16 +603,10 @@
                 renderTable(globalRows.slice(1));
 
                 // Add filter listeners
-                document.getElementById('week-filter').addEventListener('change', () => {
-                    renderTable(globalRows.slice(1), getFilters());
-                });
-
-                document.getElementById('location-filter').addEventListener('change', () => {
-                    renderTable(globalRows.slice(1), getFilters());
-                });
-
-                document.getElementById('status-filter').addEventListener('change', () => {
-                    renderTable(globalRows.slice(1), getFilters());
+                ['week-filter', 'location-filter', 'status-filter'].forEach(id => {
+                    document.getElementById(id).addEventListener('change', () => {
+                        renderTable(globalRows.slice(1), getFilters());
+                    });
                 });
             }
         }
