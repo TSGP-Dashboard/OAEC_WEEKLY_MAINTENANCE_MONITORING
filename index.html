@@ -45,6 +45,12 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
         .navbar-brand {
             display: flex;
             align-items: center;
@@ -58,6 +64,40 @@
             color: var(--accent-green);
         }
 
+        /* Top Left Sync Button Styling */
+        .btn-sync {
+            background: #1e293b;
+            color: #ffffff;
+            border: 1px solid #475569;
+            padding: 0.4rem 0.85rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-sync:hover {
+            background: #334155;
+            border-color: #64748b;
+        }
+
+        .btn-sync .sync-icon {
+            display: inline-block;
+            transition: transform 0.6s ease;
+        }
+
+        .btn-sync.spinning .sync-icon {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
         /* Main Container */
         .dashboard-container {
             max-width: 1600px;
@@ -69,7 +109,7 @@
             gap: 1.25rem;
         }
 
-        /* Top Bar Info Banner */
+        /* Info Banner */
         .info-banner {
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
@@ -103,7 +143,6 @@
             color: var(--text-primary);
         }
 
-        /* Repair Type Buttons Styling */
         .repair-type-group {
             display: flex;
             background: #f1f5f9;
@@ -147,11 +186,7 @@
             outline: none;
         }
 
-        .week-select-top:focus {
-            border-color: var(--accent-blue);
-        }
-
-        /* Gauges Grid Section */
+        /* Gauges Grid */
         .gauges-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -223,7 +258,7 @@
             font-weight: 600;
         }
 
-        /* Table Section Panel */
+        /* Table Panel */
         .table-panel {
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
@@ -271,10 +306,6 @@
             outline: none;
         }
 
-        .control-select:focus {
-            border-color: var(--accent-blue);
-        }
-
         .btn {
             padding: 0.4rem 0.85rem;
             border-radius: 4px;
@@ -304,12 +335,6 @@
             background: #f1f5f9;
         }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Compressed Layout & Responsive Table Column Widths */
         .table-wrapper {
             overflow-x: auto;
         }
@@ -345,10 +370,9 @@
             word-wrap: break-word;
         }
 
-        /* Column Specific Width Rules for Optimized Space Distribution */
         .col-unit { width: 9%; }
         .col-type { width: 9%; }
-        .col-desc { width: 37%; } /* Expanded for Repair Description */
+        .col-desc { width: 37%; }
         .col-duration { width: 9%; }
         .col-location { width: 14%; }
         .col-status { width: 9%; }
@@ -415,6 +439,11 @@
             border-color: #fde047;
         }
 
+        .status-updating {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
         .remarks-input-box {
             width: 100%;
             padding: 0.3rem 0.4rem;
@@ -430,7 +459,6 @@
             box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
         }
 
-        /* Pagination Footer */
         .table-footer {
             padding: 0.75rem 1.25rem;
             background: #f8fafc;
@@ -459,34 +487,32 @@
             color: var(--text-muted);
             font-style: italic;
         }
-
-        @media (max-width: 1024px) {
-            table {
-                table-layout: auto;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
+    <!-- Header Navigation with Top-Left Sync Button -->
     <nav class="navbar">
-        <div class="navbar-brand">
-            📊 <span>SCADA OEE</span> Equipment Repair Dashboard
+        <div class="navbar-left">
+            <button class="btn-sync" id="top-sync-btn" onclick="syncData()">
+                <span class="sync-icon">🔄</span> Sync
+            </button>
+            <div class="navbar-brand">
+                📊 <span>OAEC</span> Equipment Repair Dashboard
+            </div>
         </div>
     </nav>
 
-    <!-- Main Content Container -->
+    <!-- Main Container -->
     <div class="dashboard-container">
 
-        <!-- Top Information Banner -->
+        <!-- Info Banner -->
         <div class="info-banner">
             <div class="info-group">
                 <span class="info-label">Date Today:</span>
                 <span class="info-val" id="header-date-today">--</span>
             </div>
 
-            <!-- Repair Type Filter Buttons -->
             <div class="info-group">
                 <span class="info-label">Repair Type:</span>
                 <div class="repair-type-group">
@@ -509,10 +535,8 @@
             </div>
         </div>
 
-        <!-- Dynamic Semi-Circle Gauges Grid -->
+        <!-- Gauges Grid -->
         <div class="gauges-grid">
-            
-            <!-- Gauge 1: Total Repairs -->
             <div class="gauge-card" id="gauge-card-total" onclick="filterByGauge('ALL')">
                 <div class="gauge-title">Total Equipment Repairs</div>
                 <div class="svg-gauge-container">
@@ -532,7 +556,6 @@
                 </div>
             </div>
 
-            <!-- Gauge 2: Completed Repairs -->
             <div class="gauge-card" id="gauge-card-done" onclick="filterByGauge('DONE')">
                 <div class="gauge-title">Completed (Done)</div>
                 <div class="svg-gauge-container">
@@ -552,7 +575,6 @@
                 </div>
             </div>
 
-            <!-- Gauge 3: Pending Equipment -->
             <div class="gauge-card" id="gauge-card-notdone" onclick="filterByGauge('NOT DONE')">
                 <div class="gauge-title">Pending Equipment</div>
                 <div class="svg-gauge-container">
@@ -572,7 +594,6 @@
                 </div>
             </div>
 
-            <!-- Gauge 4: PM vs CM Gauge -->
             <div class="gauge-card" id="gauge-card-pmcm" onclick="togglePmCmGauge()">
                 <div class="gauge-title">PM vs CM Distribution</div>
                 <div class="svg-gauge-container">
@@ -590,10 +611,9 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
-        <!-- Repair Data Table Panel -->
+        <!-- Table Panel -->
         <div class="table-panel">
             <div class="table-header-bar">
                 <div class="table-title">
@@ -632,7 +652,6 @@
                 </table>
             </div>
 
-            <!-- Table Pagination Footer -->
             <div class="table-footer">
                 <div class="pagination-info" id="pagination-info">Showing 0 entries</div>
                 <div class="pagination-actions">
@@ -646,17 +665,16 @@
 
     <script>
         const DB_CONFIG = {
-            API_URL: 'https://script.google.com/macros/s/AKfycbzs99Ftdsx8rPX10yVW_IUQ8rVP93OS8uDUisbmVp8grDlOaEVksW-sO14HprTeZQ/exec'
+            API_URL: 'https://script.google.com/macros/s/AKfycbydemZ2M6VMrpqAjaDXpjO2ufJ5pZoIN7Gs33-HmM2nLwFe9qFI4TeUfb8LM8_BihT23g/exec'
         };
 
-        // Mapped to capture Column F (Index 5) for Repair Description
         const COLUMN_MAP = {
             UNIT_NO: 0,
             WEEK: 1,
             DATE_START: 2,
             DATE_END: 3,
             REPAIR_TYPE: 4,
-            REPAIR_DESC: 5, // Column F
+            REPAIR_DESC: 5,
             LOCATION: 6,
             DURATION: 7,
             STATUS: 8,
@@ -687,15 +705,18 @@
                 if (!response.ok) throw new Error(`API Response Error: ${response.status}`);
 
                 const rawData = await response.json();
-                const rows = rawData.length > 0 && String(rawData[0][0]).toLowerCase().includes('unit') 
-                    ? rawData.slice(1) 
-                    : rawData;
+                const hasHeader = rawData.length > 0 && String(rawData[0][0]).toLowerCase().includes('unit');
+                const rows = hasHeader ? rawData.slice(1) : rawData;
 
                 return rows.map((row, index) => {
                     if (!row || row.length === 0 || !row[COLUMN_MAP.UNIT_NO]) return null;
 
+                    // Compute sheetRowIndex (1-based sheet row number: +2 if header exists)
+                    const sheetRowIndex = hasHeader ? index + 2 : index + 1;
+
                     return {
                         id: index,
+                        sheetRowIndex: sheetRowIndex,
                         unitNo: row[COLUMN_MAP.UNIT_NO] || '',
                         week: row[COLUMN_MAP.WEEK] || '',
                         rawStart: parseRawDate(row[COLUMN_MAP.DATE_START]),
@@ -703,7 +724,7 @@
                         dateStart: formatDate(row[COLUMN_MAP.DATE_START]),
                         dateEnd: formatDate(row[COLUMN_MAP.DATE_END]),
                         repairType: String(row[COLUMN_MAP.REPAIR_TYPE] || '').trim(),
-                        repairDesc: row[COLUMN_MAP.REPAIR_DESC] || '', // Captures Column F
+                        repairDesc: row[COLUMN_MAP.REPAIR_DESC] || '',
                         duration: row[COLUMN_MAP.DURATION] || '',
                         location: row[COLUMN_MAP.LOCATION] || '',
                         status: row[COLUMN_MAP.STATUS] || 'NOT DONE',
@@ -714,6 +735,73 @@
                 console.error('Error fetching sheet data:', error);
                 showError('⚠️ Failed to load sheet data. Verify Apps Script Web App Deployment.');
                 return [];
+            }
+        }
+
+        // Send backend POST request to persist changes to Google Sheets
+        async function updateRowInSheet(item) {
+            try {
+                const payload = {
+                    action: 'updateRow',
+                    sheetRowIndex: item.sheetRowIndex,
+                    unitNo: item.unitNo,
+                    week: item.week,
+                    status: item.status,
+                    remarks: item.remarks
+                };
+
+                // Send request via fetch POST or URL query parameters
+                await fetch(DB_CONFIG.API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                console.log(`Successfully synced Unit ${item.unitNo} (Status: ${item.status}) to Database.`);
+            } catch (error) {
+                console.error('Failed to update DB:', error);
+            }
+        }
+
+        async function syncData() {
+            const syncBtn = document.getElementById('top-sync-btn');
+            if (syncBtn) syncBtn.classList.add('spinning');
+
+            parsedDataList = await fetchFromSheets();
+            if (parsedDataList.length > 0) {
+                populateFilters();
+                updateTopHeaderInfo();
+                renderTable();
+            }
+
+            setTimeout(() => {
+                if (syncBtn) syncBtn.classList.remove('spinning');
+            }, 600);
+        }
+
+        async function updateStatus(id, newStatus) {
+            const item = parsedDataList.find(d => d.id === id);
+            if (item) {
+                item.status = newStatus;
+                updateStatsAndGauges(getFilteredData());
+                
+                const selectElem = document.getElementById(`status-select-${id}`);
+                if (selectElem) {
+                    const isDone = newStatus.toLowerCase() === 'done';
+                    selectElem.className = `status-dropdown ${isDone ? 'status-done' : 'status-notdone'}`;
+                }
+
+                // Send update directly to database
+                await updateRowInSheet(item);
+            }
+        }
+
+        async function updateRemarks(id, newRemarks) {
+            const item = parsedDataList.find(d => d.id === id);
+            if (item) {
+                item.remarks = newRemarks;
+                // Send update directly to database
+                await updateRowInSheet(item);
             }
         }
 
@@ -784,12 +872,7 @@
 
         function filterByGauge(statusType) {
             const statusFilter = document.getElementById('status-filter');
-            if (statusType === 'ALL') {
-                statusFilter.value = '';
-            } else {
-                statusFilter.value = statusType;
-            }
-            
+            statusFilter.value = statusType === 'ALL' ? '' : statusType;
             currentPage = 1;
             renderTable();
         }
@@ -831,26 +914,6 @@
             if (currentPage < 1) currentPage = 1;
             if (currentPage > totalPages) currentPage = totalPages;
             renderTable();
-        }
-
-        function updateStatus(id, newStatus) {
-            const item = parsedDataList.find(d => d.id === id);
-            if (item) {
-                item.status = newStatus;
-                updateStatsAndGauges(getFilteredData());
-                const selectElem = document.getElementById(`status-select-${id}`);
-                if (selectElem) {
-                    const isDone = newStatus.toLowerCase() === 'done';
-                    selectElem.className = `status-dropdown ${isDone ? 'status-done' : 'status-notdone'}`;
-                }
-            }
-        }
-
-        function updateRemarks(id, newRemarks) {
-            const item = parsedDataList.find(d => d.id === id);
-            if (item) {
-                item.remarks = newRemarks;
-            }
         }
 
         function populateFilters() {
@@ -968,9 +1031,7 @@
 
         function setNeedleAngle(elementId, degrees) {
             const el = document.getElementById(elementId);
-            if (el) {
-                el.setAttribute('transform', `rotate(${degrees}, 100, 100)`);
-            }
+            if (el) el.setAttribute('transform', `rotate(${degrees}, 100, 100)`);
         }
 
         function highlightActiveGaugeCard() {
@@ -1022,10 +1083,8 @@
         }
 
         async function init() {
-            parsedDataList = await fetchFromSheets();
-
+            await syncData();
             if (parsedDataList.length > 0) {
-                populateFilters();
                 autoSelectCurrentWeek();
                 updateTopHeaderInfo();
                 renderTable();
@@ -1042,8 +1101,6 @@
                         renderTable();
                     });
                 });
-            } else {
-                showError('No valid repair data found.');
             }
         }
 
