@@ -80,7 +80,7 @@
             z-index: 2;
         }
 
-        /* Top Info Banner for Date & Week Number */
+        /* Top Info Banner for Date & Functional Week Selector */
         .header-info-card {
             background: rgba(20, 25, 50, 0.8);
             border: 1px solid rgba(0, 255, 150, 0.2);
@@ -98,7 +98,7 @@
         .header-info-item {
             display: flex;
             flex-direction: column;
-            gap: 0.3rem;
+            gap: 0.4rem;
         }
 
         .header-info-label {
@@ -112,6 +112,31 @@
             font-size: 20px;
             font-weight: 700;
             color: #00ff96;
+        }
+
+        .header-info-select {
+            background: rgba(0, 255, 150, 0.1);
+            border: 1px solid rgba(0, 255, 150, 0.4);
+            border-radius: 4px;
+            color: #00ff96;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 0.3rem 0.6rem;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .header-info-select:hover,
+        .header-info-select:focus {
+            border-color: #00ff96;
+            box-shadow: 0 0 12px rgba(0, 255, 150, 0.3);
+        }
+
+        .header-info-select option {
+            background: #0a0e27;
+            color: #00ff96;
+            font-size: 14px;
         }
 
         .card {
@@ -393,7 +418,7 @@
         <!-- Dashboard Section -->
         <section class="dashboard-section">
             
-            <!-- Top Header Banner (Date Today, Week Number, Date Range) -->
+            <!-- Top Header Banner (Date Today, Week Selector, Date Range) -->
             <div class="header-info-card">
                 <div class="header-info-item">
                     <span class="header-info-label">Date Today</span>
@@ -401,7 +426,9 @@
                 </div>
                 <div class="header-info-item">
                     <span class="header-info-label">Week Number</span>
-                    <span class="header-info-value" id="header-week-num">--</span>
+                    <select class="header-info-select" id="week-select">
+                        <option value="">All Weeks</option>
+                    </select>
                 </div>
                 <div class="header-info-item">
                     <span class="header-info-label">Week Duration</span>
@@ -434,9 +461,7 @@
                 <div class="card-header">
                     <div class="card-title">Weekly Repair Plan</div>
                     <div class="filters">
-                        <select class="select-input" id="week-filter">
-                            <option value="">All Weeks</option>
-                        </select>
+                        <!-- Lower Week Filter Removed to Avoid Redundancy -->
                         <select class="select-input" id="location-filter">
                             <option value="">All Locations</option>
                         </select>
@@ -479,18 +504,10 @@
     </div>
 
     <script>
-        // ============================================
-        // DATABASE CONFIGURATION
-        // ============================================
         const DB_CONFIG = {
             API_URL: 'https://script.google.com/macros/s/AKfycbzs99Ftdsx8rPX10yVW_IUQ8rVP93OS8uDUisbmVp8grDlOaEVksW-sO14HprTeZQ/exec'
         };
 
-        // Exact Database Column Indices (0-indexed):
-        // Col A(0): unit_no     | Col B(1): week       | Col C(2): date_start 
-        // Col D(3): date_end    | Col E(4): repair_type| Col F(5): activity
-        // Col G(6): location    | Col H(7): duration   | Col I(8): status
-        // Col J(9): remarks
         const COLUMN_MAP = {
             UNIT_NO: 0,
             WEEK: 1,
@@ -507,17 +524,13 @@
         let currentPage = 1;
         const PAGE_SIZE = 30;
 
-        // Helper function to format date objects or strings safely
         function formatDate(rawDate) {
             if (!rawDate) return '';
             const d = new Date(rawDate);
-            if (isNaN(d.getTime())) return rawDate; // Fallback to raw string if parsing fails
+            if (isNaN(d.getTime())) return rawDate;
             return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, '-');
         }
 
-        // ============================================
-        // FETCH DATA
-        // ============================================
         async function fetchFromSheets() {
             try {
                 const response = await fetch(DB_CONFIG.API_URL);
@@ -525,8 +538,6 @@
 
                 const rawData = await response.json();
                 
-                // Header rows or standard data rows parsing
-                // Filter out non-data header row if first row contains column labels
                 const rows = rawData.length > 0 && String(rawData[0][0]).toLowerCase().includes('unit') 
                     ? rawData.slice(1) 
                     : rawData;
@@ -540,11 +551,11 @@
                         week: row[COLUMN_MAP.WEEK] || '',
                         dateStart: formatDate(row[COLUMN_MAP.DATE_START]),
                         dateEnd: formatDate(row[COLUMN_MAP.DATE_END]),
-                        repairType: row[COLUMN_MAP.REPAIR_TYPE] || '', // Column E
-                        duration: row[COLUMN_MAP.DURATION] || '',     // Column H
-                        location: row[COLUMN_MAP.LOCATION] || '',     // Column G
-                        status: row[COLUMN_MAP.STATUS] || 'NOT DONE',  // Column I
-                        remarks: row[COLUMN_MAP.REMARKS] || ''        // Column J
+                        repairType: row[COLUMN_MAP.REPAIR_TYPE] || '',
+                        duration: row[COLUMN_MAP.DURATION] || '',
+                        location: row[COLUMN_MAP.LOCATION] || '',
+                        status: row[COLUMN_MAP.STATUS] || 'NOT DONE',
+                        remarks: row[COLUMN_MAP.REMARKS] || ''
                     };
                 }).filter(Boolean);
             } catch (error) {
@@ -554,30 +565,27 @@
             }
         }
 
-        // ============================================
-        // HEADER DISPLAY UPDATER
-        // ============================================
         function updateTopHeaderInfo() {
             // Set Today's Date
             const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, '-');
             document.getElementById('header-date-today').textContent = today;
 
-            // Extract Week and Range from first item or selected filter
+            const selectedWeek = document.getElementById('week-select').value;
+            
             if (parsedDataList.length > 0) {
-                const sample = parsedDataList[0];
-                document.getElementById('header-week-num').textContent = sample.week ? `Week ${sample.week}` : '--';
-                
-                if (sample.dateStart && sample.dateEnd) {
-                    document.getElementById('header-week-range').textContent = `${sample.dateStart} to ${sample.dateEnd}`;
+                // Find matching row for week duration or fallback to first entry
+                const match = selectedWeek 
+                    ? parsedDataList.find(d => String(d.week) === String(selectedWeek))
+                    : parsedDataList[0];
+
+                if (match && match.dateStart && match.dateEnd) {
+                    document.getElementById('header-week-range').textContent = `${match.dateStart} to ${match.dateEnd}`;
                 } else {
-                    document.getElementById('header-week-range').textContent = '--';
+                    document.getElementById('header-week-range').textContent = 'All Dates';
                 }
             }
         }
 
-        // ============================================
-        // FILTERING & PAGINATION
-        // ============================================
         function getFilteredData() {
             const filters = getFilters();
             return parsedDataList.filter(item => {
@@ -590,16 +598,17 @@
 
         function getFilters() {
             return {
-                week: document.getElementById('week-filter').value,
+                week: document.getElementById('week-select').value,
                 location: document.getElementById('location-filter').value,
                 status: document.getElementById('status-filter').value
             };
         }
 
         function resetDisplay() {
-            document.getElementById('week-filter').value = '';
+            document.getElementById('week-select').value = '';
             document.getElementById('location-filter').value = '';
             document.getElementById('status-filter').value = '';
+            updateTopHeaderInfo();
             currentPage = 1;
             renderTable();
         }
@@ -613,9 +622,6 @@
             renderTable();
         }
 
-        // ============================================
-        // INLINE EDITING HANDLERS
-        // ============================================
         function updateStatus(id, newStatus) {
             const item = parsedDataList.find(d => d.id === id);
             if (item) {
@@ -636,26 +642,23 @@
             }
         }
 
-        // ============================================
-        // RENDER TABLE & UI
-        // ============================================
         function populateFilters() {
-            const weeks = [...new Set(parsedDataList.map(r => r.week).filter(Boolean))];
+            const weeks = [...new Set(parsedDataList.map(r => r.week).filter(Boolean))].sort((a,b) => a - b);
             const locations = [...new Set(parsedDataList.map(r => r.location).filter(Boolean))];
             const statuses = [...new Set(parsedDataList.map(r => r.status).filter(Boolean))];
 
-            populateSelect('week-filter', weeks);
+            populateSelect('week-select', weeks, 'Week ');
             populateSelect('location-filter', locations);
             populateSelect('status-filter', statuses);
         }
 
-        function populateSelect(selectId, values) {
+        function populateSelect(selectId, values, prefix = '') {
             const select = document.getElementById(selectId);
             values.forEach(val => {
                 if (!select.querySelector(`option[value="${val}"]`)) {
                     const opt = document.createElement('option');
                     opt.value = val;
-                    opt.textContent = val;
+                    opt.textContent = `${prefix}${val}`;
                     select.appendChild(opt);
                 }
             });
@@ -715,7 +718,6 @@
                 `;
             }).join('');
 
-            // Pagination text update
             document.getElementById('pagination-info').textContent = `Showing ${startIdx + 1} to ${endIdx} of ${totalItems} entries (Page ${currentPage} of ${totalPages})`;
             document.getElementById('prev-btn').disabled = currentPage === 1;
             document.getElementById('next-btn').disabled = currentPage === totalPages;
@@ -739,9 +741,6 @@
             document.getElementById('table-body').innerHTML = `<tr><td colspan="6" class="empty-state">${message}</td></tr>`;
         }
 
-        // ============================================
-        // EXPORT TO CSV
-        // ============================================
         function exportData() {
             const filtered = getFilteredData();
             if (filtered.length === 0) return;
@@ -767,18 +766,21 @@
             a.click();
         }
 
-        // ============================================
-        // INITIALIZE
-        // ============================================
         async function init() {
             parsedDataList = await fetchFromSheets();
 
             if (parsedDataList.length > 0) {
-                updateTopHeaderInfo();
                 populateFilters();
+                updateTopHeaderInfo();
                 renderTable();
 
-                ['week-filter', 'location-filter', 'status-filter'].forEach(id => {
+                document.getElementById('week-select').addEventListener('change', () => {
+                    updateTopHeaderInfo();
+                    currentPage = 1;
+                    renderTable();
+                });
+
+                ['location-filter', 'status-filter'].forEach(id => {
                     document.getElementById(id).addEventListener('change', () => {
                         currentPage = 1;
                         renderTable();
