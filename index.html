@@ -80,6 +80,40 @@
             z-index: 2;
         }
 
+        /* Top Info Banner for Date & Week Number */
+        .header-info-card {
+            background: rgba(20, 25, 50, 0.8);
+            border: 1px solid rgba(0, 255, 150, 0.2);
+            border-radius: 8px;
+            padding: 1.25rem 2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .header-info-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #a0a0a0;
+        }
+
+        .header-info-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #00ff96;
+        }
+
         .card {
             background: rgba(20, 25, 50, 0.8);
             border: 1px solid rgba(0, 255, 150, 0.2);
@@ -237,7 +271,6 @@
             background: rgba(0, 255, 150, 0.05);
         }
 
-        /* Interactive Editable Table Controls */
         .status-select {
             padding: 0.4rem 0.6rem;
             border-radius: 4px;
@@ -285,7 +318,6 @@
             box-shadow: 0 0 8px rgba(0, 255, 150, 0.2);
         }
 
-        /* Pagination Layout */
         .pagination-container {
             display: flex;
             justify-content: space-between;
@@ -316,6 +348,11 @@
         }
 
         @media (max-width: 768px) {
+            .header-info-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
             .card-header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -355,6 +392,23 @@
 
         <!-- Dashboard Section -->
         <section class="dashboard-section">
+            
+            <!-- Top Header Banner (Date Today, Week Number, Date Range) -->
+            <div class="header-info-card">
+                <div class="header-info-item">
+                    <span class="header-info-label">Date Today</span>
+                    <span class="header-info-value" id="header-date-today">--</span>
+                </div>
+                <div class="header-info-item">
+                    <span class="header-info-label">Week Number</span>
+                    <span class="header-info-value" id="header-week-num">--</span>
+                </div>
+                <div class="header-info-item">
+                    <span class="header-info-label">Week Duration</span>
+                    <span class="header-info-value" id="header-week-range">--</span>
+                </div>
+            </div>
+
             <!-- Statistics -->
             <div class="stats-grid">
                 <div class="stat-box">
@@ -412,7 +466,7 @@
                     </table>
                 </div>
 
-                <!-- Pagination Footer -->
+                <!-- Pagination Controls -->
                 <div class="pagination-container">
                     <div class="pagination-info" id="pagination-info">Showing 0 of 0 entries</div>
                     <div class="pagination-controls">
@@ -432,22 +486,34 @@
             API_URL: 'https://script.google.com/macros/s/AKfycbzs99Ftdsx8rPX10yVW_IUQ8rVP93OS8uDUisbmVp8grDlOaEVksW-sO14HprTeZQ/exec'
         };
 
-        // Simplified Column Mapping based on Weekly Repair Plan structure:
-        // Col A(0): UNIT NO | Col B(1): REPAIR TYPE | Col C(2): DURATION 
-        // Col D(3): LOCATION | Col E(4): STATUS | Col F(5): REMARKS
+        // Exact Database Column Indices (0-indexed):
+        // Col A(0): unit_no     | Col B(1): week       | Col C(2): date_start 
+        // Col D(3): date_end    | Col E(4): repair_type| Col F(5): activity
+        // Col G(6): location    | Col H(7): duration   | Col I(8): status
+        // Col J(9): remarks
         const COLUMN_MAP = {
             UNIT_NO: 0,
-            REPAIR_TYPE: 1,
-            DURATION: 2,
-            LOCATION: 3,
-            STATUS: 4,
-            REMARKS: 5
+            WEEK: 1,
+            DATE_START: 2,
+            DATE_END: 3,
+            REPAIR_TYPE: 4,
+            LOCATION: 6,
+            DURATION: 7,
+            STATUS: 8,
+            REMARKS: 9
         };
 
-        let globalMetaData = { week: '', dateStart: '', dateEnd: '' };
-        let parsedDataList = []; // Holds structured objects
+        let parsedDataList = [];
         let currentPage = 1;
         const PAGE_SIZE = 30;
+
+        // Helper function to format date objects or strings safely
+        function formatDate(rawDate) {
+            if (!rawDate) return '';
+            const d = new Date(rawDate);
+            if (isNaN(d.getTime())) return rawDate; // Fallback to raw string if parsing fails
+            return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, '-');
+        }
 
         // ============================================
         // FETCH DATA
@@ -459,39 +525,58 @@
 
                 const rawData = await response.json();
                 
-                // Extract metadata from header block
-                if (rawData.length >= 2) {
-                    globalMetaData.week = rawData[1]?.[1] || '';      
-                    globalMetaData.dateStart = rawData[1]?.[2] || ''; 
-                    globalMetaData.dateEnd = rawData[1]?.[3] || '';   
-                }
+                // Header rows or standard data rows parsing
+                // Filter out non-data header row if first row contains column labels
+                const rows = rawData.length > 0 && String(rawData[0][0]).toLowerCase().includes('unit') 
+                    ? rawData.slice(1) 
+                    : rawData;
 
-                // Table rows start at index 4 (Row 5 in Google Sheet)
-                const dataRows = rawData.length > 4 ? rawData.slice(4) : [];
-                
-                // Parse rows into objects with explicit IDs for tracking edits
-                return dataRows.map((row, index) => {
+                return rows.map((row, index) => {
                     if (!row || row.length === 0 || !row[COLUMN_MAP.UNIT_NO]) return null;
+
                     return {
                         id: index,
                         unitNo: row[COLUMN_MAP.UNIT_NO] || '',
-                        week: globalMetaData.week,
-                        repairType: row[COLUMN_MAP.REPAIR_TYPE] || '',
-                        duration: row[COLUMN_MAP.DURATION] || '',
-                        location: row[COLUMN_MAP.LOCATION] || '',
-                        status: row[COLUMN_MAP.STATUS] || 'NOT DONE',
-                        remarks: row[COLUMN_MAP.REMARKS] || ''
+                        week: row[COLUMN_MAP.WEEK] || '',
+                        dateStart: formatDate(row[COLUMN_MAP.DATE_START]),
+                        dateEnd: formatDate(row[COLUMN_MAP.DATE_END]),
+                        repairType: row[COLUMN_MAP.REPAIR_TYPE] || '', // Column E
+                        duration: row[COLUMN_MAP.DURATION] || '',     // Column H
+                        location: row[COLUMN_MAP.LOCATION] || '',     // Column G
+                        status: row[COLUMN_MAP.STATUS] || 'NOT DONE',  // Column I
+                        remarks: row[COLUMN_MAP.REMARKS] || ''        // Column J
                     };
                 }).filter(Boolean);
             } catch (error) {
                 console.error('Error loading data:', error);
-                showError('❌ Error loading data. Ensure Google Apps Script is deployed.');
+                showError('❌ Error loading data. Check Web App URL deployment.');
                 return [];
             }
         }
 
         // ============================================
-        // FILTERING & PAGINATION LOGIC
+        // HEADER DISPLAY UPDATER
+        // ============================================
+        function updateTopHeaderInfo() {
+            // Set Today's Date
+            const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, '-');
+            document.getElementById('header-date-today').textContent = today;
+
+            // Extract Week and Range from first item or selected filter
+            if (parsedDataList.length > 0) {
+                const sample = parsedDataList[0];
+                document.getElementById('header-week-num').textContent = sample.week ? `Week ${sample.week}` : '--';
+                
+                if (sample.dateStart && sample.dateEnd) {
+                    document.getElementById('header-week-range').textContent = `${sample.dateStart} to ${sample.dateEnd}`;
+                } else {
+                    document.getElementById('header-week-range').textContent = '--';
+                }
+            }
+        }
+
+        // ============================================
+        // FILTERING & PAGINATION
         // ============================================
         function getFilteredData() {
             const filters = getFilters();
@@ -536,7 +621,6 @@
             if (item) {
                 item.status = newStatus;
                 updateStats(getFilteredData());
-                // Re-apply class styling to the changed dropdown
                 const selectElem = document.getElementById(`status-select-${id}`);
                 if (selectElem) {
                     const isDone = newStatus.toLowerCase() === 'done';
@@ -553,7 +637,7 @@
         }
 
         // ============================================
-        // UI & RENDER FUNCTIONS
+        // RENDER TABLE & UI
         // ============================================
         function populateFilters() {
             const weeks = [...new Set(parsedDataList.map(r => r.week).filter(Boolean))];
@@ -631,7 +715,7 @@
                 `;
             }).join('');
 
-            // Update Pagination Controls
+            // Pagination text update
             document.getElementById('pagination-info').textContent = `Showing ${startIdx + 1} to ${endIdx} of ${totalItems} entries (Page ${currentPage} of ${totalPages})`;
             document.getElementById('prev-btn').disabled = currentPage === 1;
             document.getElementById('next-btn').disabled = currentPage === totalPages;
@@ -690,12 +774,13 @@
             parsedDataList = await fetchFromSheets();
 
             if (parsedDataList.length > 0) {
+                updateTopHeaderInfo();
                 populateFilters();
                 renderTable();
 
                 ['week-filter', 'location-filter', 'status-filter'].forEach(id => {
                     document.getElementById(id).addEventListener('change', () => {
-                        currentPage = 1; // Reset to first page on filter change
+                        currentPage = 1;
                         renderTable();
                     });
                 });
