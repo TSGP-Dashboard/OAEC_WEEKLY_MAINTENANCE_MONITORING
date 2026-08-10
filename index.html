@@ -939,7 +939,10 @@
             
             // Filter out duration format values (e.g., "1 HOUR", "4hrs", "3days") from location filter dropdown
             const locations = [...new Set(parsedDataList.map(r => r.location).filter(Boolean))]
-                .filter(loc => !/\b(hour|hours|hr|hrs|day|days)\b/i.test(loc));
+                .filter(loc => {
+    const durationPattern = /^\d+\s*(hour|hours|hr|hrs|day|days|min|mins|minute|minutes)\s*$/i;
+    return !durationPattern.test(loc.trim());
+        });
 
             populateSelect('week-select', weeks, 'Week ');
             populateSelect('location-filter', locations);
