@@ -103,6 +103,38 @@
             color: var(--text-primary);
         }
 
+        /* Repair Type Buttons Styling */
+        .repair-type-group {
+            display: flex;
+            background: #f1f5f9;
+            padding: 3px;
+            border-radius: 6px;
+            border: 1px solid var(--panel-border);
+            gap: 2px;
+        }
+
+        .type-btn {
+            border: none;
+            background: transparent;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .type-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .type-btn.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
         .week-select-top {
             background: #f8fafc;
             border: 1px solid var(--panel-border);
@@ -174,10 +206,11 @@
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
+            white-space: nowrap;
         }
 
         .gauge-value {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 800;
             color: var(--text-primary);
             line-height: 1;
@@ -276,7 +309,7 @@
             cursor: not-allowed;
         }
 
-        /* Professional Compact Data Table */
+        /* Table Data Styling */
         .table-wrapper {
             overflow-x: auto;
         }
@@ -320,6 +353,24 @@
         .unit-cell {
             font-weight: 700;
             color: var(--header-bg);
+        }
+
+        .type-tag {
+            display: inline-block;
+            padding: 0.15rem 0.45rem;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .type-tag-pm {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .type-tag-cm {
+            background: #fef2f2;
+            color: #b91c1c;
         }
 
         .status-dropdown {
@@ -426,19 +477,31 @@
                 <span class="info-label">Date Today:</span>
                 <span class="info-val" id="header-date-today">--</span>
             </div>
+
+            <!-- REPAIR TYPE BUTTONS (Added right after Date Today) -->
+            <div class="info-group">
+                <span class="info-label">Repair Type:</span>
+                <div class="repair-type-group">
+                    <button class="type-btn active" id="btn-type-all" onclick="setRepairTypeFilter('')">ALL</button>
+                    <button class="type-btn" id="btn-type-pm" onclick="setRepairTypeFilter('PM')">PM</button>
+                    <button class="type-btn" id="btn-type-cm" onclick="setRepairTypeFilter('CM')">CM</button>
+                </div>
+            </div>
+
             <div class="info-group">
                 <span class="info-label">Select Week:</span>
                 <select class="week-select-top" id="week-select">
                     <option value="">All Weeks</option>
                 </select>
             </div>
+            
             <div class="info-group">
                 <span class="info-label">Week Duration:</span>
                 <span class="info-val" id="header-week-range">--</span>
             </div>
         </div>
 
-        <!-- Dynamic Semi-Circle Gauges Grid (Interactive Filters) -->
+        <!-- Dynamic Semi-Circle Gauges Grid -->
         <div class="gauges-grid">
             
             <!-- Gauge 1: Total Repairs -->
@@ -446,11 +509,9 @@
                 <div class="gauge-title">Total Equipment Repairs</div>
                 <div class="svg-gauge-container">
                     <svg viewBox="0 0 200 110" width="100%" height="100%">
-                        <!-- Base Arc Segments (Green, Yellow, Red) -->
-                        <path d="M 20,100 A 80,80 0 0,1 73,30" fill="none" stroke="#10b981" stroke-width="18" stroke-linecap="butt"/>
-                        <path d="M 76,28 A 80,80 0 0,1 124,28" fill="none" stroke="#f59e0b" stroke-width="18" stroke-linecap="butt"/>
-                        <path d="M 127,30 A 80,80 0 0,1 180,100" fill="none" stroke="#ef4444" stroke-width="18" stroke-linecap="butt"/>
-                        <!-- Needle -->
+                        <path d="M 20,100 A 80,80 0 0,1 73,30" fill="none" stroke="#10b981" stroke-width="18"/>
+                        <path d="M 76,28 A 80,80 0 0,1 124,28" fill="none" stroke="#f59e0b" stroke-width="18"/>
+                        <path d="M 127,30 A 80,80 0 0,1 180,100" fill="none" stroke="#ef4444" stroke-width="18"/>
                         <g id="needle-total" transform="rotate(0, 100, 100)" style="transition: transform 0.6s ease-out;">
                             <line x1="100" y1="100" x2="100" y2="30" stroke="#1e293b" stroke-width="3.5" stroke-linecap="round"/>
                             <circle cx="100" cy="100" r="6" fill="#1e293b"/>
@@ -483,7 +544,7 @@
                 </div>
             </div>
 
-            <!-- Gauge 3: Pending Repairs (Clickable to Filter Pending Equipment) -->
+            <!-- Gauge 3: Pending Equipment (Clickable to Filter) -->
             <div class="gauge-card" id="gauge-card-notdone" onclick="filterByGauge('NOT DONE')">
                 <div class="gauge-title">Pending Equipment</div>
                 <div class="svg-gauge-container">
@@ -503,22 +564,21 @@
                 </div>
             </div>
 
-            <!-- Gauge 4: Active Locations -->
-            <div class="gauge-card" id="gauge-card-locations" onclick="filterByGauge('ALL')">
-                <div class="gauge-title">Active Locations</div>
+            <!-- Gauge 4: PM vs CM Gauge (Replaces Active Locations) -->
+            <div class="gauge-card" id="gauge-card-pmcm" onclick="togglePmCmGauge()">
+                <div class="gauge-title">PM vs CM Distribution</div>
                 <div class="svg-gauge-container">
                     <svg viewBox="0 0 200 110" width="100%" height="100%">
-                        <path d="M 20,100 A 80,80 0 0,1 73,30" fill="none" stroke="#10b981" stroke-width="18"/>
-                        <path d="M 76,28 A 80,80 0 0,1 124,28" fill="none" stroke="#f59e0b" stroke-width="18"/>
-                        <path d="M 127,30 A 80,80 0 0,1 180,100" fill="none" stroke="#ef4444" stroke-width="18"/>
-                        <g id="needle-locations" transform="rotate(45, 100, 100)" style="transition: transform 0.6s ease-out;">
+                        <path d="M 20,100 A 80,80 0 0,1 100,20" fill="none" stroke="#2563eb" stroke-width="18"/>
+                        <path d="M 100,20 A 80,80 0 0,1 180,100" fill="none" stroke="#ef4444" stroke-width="18"/>
+                        <g id="needle-pmcm" transform="rotate(0, 100, 100)" style="transition: transform 0.6s ease-out;">
                             <line x1="100" y1="100" x2="100" y2="30" stroke="#1e293b" stroke-width="3.5" stroke-linecap="round"/>
                             <circle cx="100" cy="100" r="6" fill="#1e293b"/>
                         </g>
                     </svg>
                     <div class="gauge-center-text">
-                        <div class="gauge-value" id="stat-locations">0</div>
-                        <div class="gauge-subtext">Sites Active</div>
+                        <div class="gauge-value" id="stat-pmcm-counts">0 / 0</div>
+                        <div class="gauge-subtext" id="stat-pmcm-ratio">PM vs CM</div>
                     </div>
                 </div>
             </div>
@@ -558,7 +618,7 @@
                         </tr>
                     </thead>
                     <tbody id="table-body">
-                        <tr><td colspan="6" class="empty-row">Loading database schedule...</td></tr>
+                        <tr><td colspan="6" class="empty-row">Loading schedule...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -576,12 +636,10 @@
     </div>
 
     <script>
-        // Google Sheet Database Web App API URL
         const DB_CONFIG = {
             API_URL: 'https://script.google.com/macros/s/AKfycbzs99Ftdsx8rPX10yVW_IUQ8rVP93OS8uDUisbmVp8grDlOaEVksW-sO14HprTeZQ/exec'
         };
 
-        // Column Index Mapping
         const COLUMN_MAP = {
             UNIT_NO: 0,
             WEEK: 1,
@@ -597,11 +655,18 @@
         let parsedDataList = [];
         let currentPage = 1;
         const PAGE_SIZE = 25;
+        let selectedRepairType = ''; // 'PM', 'CM', or ''
+
+        function parseRawDate(rawDate) {
+            if (!rawDate) return null;
+            const d = new Date(rawDate);
+            return isNaN(d.getTime()) ? null : d;
+        }
 
         function formatDate(rawDate) {
             if (!rawDate) return '';
-            const d = new Date(rawDate);
-            if (isNaN(d.getTime())) return rawDate;
+            const d = parseRawDate(rawDate);
+            if (!d) return rawDate;
             return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, '-');
         }
 
@@ -622,9 +687,11 @@
                         id: index,
                         unitNo: row[COLUMN_MAP.UNIT_NO] || '',
                         week: row[COLUMN_MAP.WEEK] || '',
+                        rawStart: parseRawDate(row[COLUMN_MAP.DATE_START]),
+                        rawEnd: parseRawDate(row[COLUMN_MAP.DATE_END]),
                         dateStart: formatDate(row[COLUMN_MAP.DATE_START]),
                         dateEnd: formatDate(row[COLUMN_MAP.DATE_END]),
-                        repairType: row[COLUMN_MAP.REPAIR_TYPE] || '',
+                        repairType: String(row[COLUMN_MAP.REPAIR_TYPE] || '').trim(),
                         duration: row[COLUMN_MAP.DURATION] || '',
                         location: row[COLUMN_MAP.LOCATION] || '',
                         status: row[COLUMN_MAP.STATUS] || 'NOT DONE',
@@ -638,9 +705,59 @@
             }
         }
 
+        /* Auto Select Active Week based on Today's Date */
+        function autoSelectCurrentWeek() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Find matching week where today falls between rawStart and rawEnd
+            const matchedRow = parsedDataList.find(item => {
+                if (!item.rawStart || !item.rawEnd) return false;
+                const start = new Date(item.rawStart);
+                const end = new Date(item.rawEnd);
+                start.setHours(0, 0, 0, 0);
+                end.setHours(23, 59, 59, 999);
+                return today >= start && today <= end;
+            });
+
+            const weekSelect = document.getElementById('week-select');
+            if (matchedRow && matchedRow.week) {
+                weekSelect.value = matchedRow.week;
+            } else if (weekSelect.options.length > 1) {
+                // Default to latest available week if today isn't explicitly in range
+                weekSelect.selectedIndex = 1;
+            }
+        }
+
+        function setRepairTypeFilter(type) {
+            selectedRepairType = type;
+            document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (type === 'PM') {
+                document.getElementById('btn-type-pm').classList.add('active');
+            } else if (type === 'CM') {
+                document.getElementById('btn-type-cm').classList.add('active');
+            } else {
+                document.getElementById('btn-type-all').classList.add('active');
+            }
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function togglePmCmGauge() {
+            if (selectedRepairType === 'PM') {
+                setRepairTypeFilter('CM');
+            } else if (selectedRepairType === 'CM') {
+                setRepairTypeFilter('');
+            } else {
+                setRepairTypeFilter('PM');
+            }
+        }
+
         function updateTopHeaderInfo() {
-            const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, '-');
-            document.getElementById('header-date-today').textContent = today;
+            const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, '-');
+            document.getElementById('header-date-today').textContent = todayStr;
 
             const selectedWeek = document.getElementById('week-select').value;
             if (parsedDataList.length > 0) {
@@ -656,7 +773,6 @@
             }
         }
 
-        /* Filter Triggered by Gauge Clicks */
         function filterByGauge(statusType) {
             const statusFilter = document.getElementById('status-filter');
             if (statusType === 'ALL') {
@@ -675,6 +791,7 @@
                 if (filters.week && String(item.week) !== String(filters.week)) return false;
                 if (filters.location && item.location !== filters.location) return false;
                 if (filters.status && item.status.toLowerCase() !== filters.status.toLowerCase()) return false;
+                if (selectedRepairType && !item.repairType.toUpperCase().includes(selectedRepairType)) return false;
                 return true;
             });
         }
@@ -691,6 +808,8 @@
             document.getElementById('week-select').value = '';
             document.getElementById('location-filter').value = '';
             document.getElementById('status-filter').value = '';
+            setRepairTypeFilter('');
+            autoSelectCurrentWeek();
             updateTopHeaderInfo();
             currentPage = 1;
             renderTable();
@@ -769,11 +888,13 @@
             tbody.innerHTML = pageData.map(item => {
                 const isDone = item.status.toLowerCase() === 'done';
                 const statusClass = isDone ? 'status-done' : 'status-notdone';
+                const isPM = item.repairType.toUpperCase().includes('PM');
+                const typeClass = isPM ? 'type-tag-pm' : 'type-tag-cm';
 
                 return `
                     <tr>
                         <td class="unit-cell">${item.unitNo}</td>
-                        <td>${item.repairType}</td>
+                        <td><span class="type-tag ${typeClass}">${item.repairType}</span></td>
                         <td>${item.duration}</td>
                         <td>${item.location}</td>
                         <td>
@@ -807,12 +928,14 @@
             highlightActiveGaugeCard();
         }
 
-        /* Update Gauge Values & Animate Gauge Needles */
+        /* Update Gauge Values & PM vs CM Gauge Dial */
         function updateStatsAndGauges(filteredData) {
             const total = filteredData.length;
             const done = filteredData.filter(r => r.status.toLowerCase() === 'done').length;
             const notDone = filteredData.filter(r => r.status.toLowerCase() !== 'done').length;
-            const locations = new Set(filteredData.map(r => r.location)).size;
+
+            const pmCount = filteredData.filter(r => r.repairType.toUpperCase().includes('PM')).length;
+            const cmCount = filteredData.filter(r => r.repairType.toUpperCase().includes('CM')).length;
 
             const donePct = total > 0 ? Math.round((done / total) * 100) : 0;
             const notDonePct = total > 0 ? Math.round((notDone / total) * 100) : 0;
@@ -824,13 +947,16 @@
             document.getElementById('stat-notdone').textContent = notDone;
             document.getElementById('stat-notdone-pct').textContent = `${notDonePct}% Pending`;
 
-            document.getElementById('stat-locations').textContent = locations;
+            // PM vs CM Gauge stats
+            document.getElementById('stat-pmcm-counts').textContent = `${pmCount} PM / ${cmCount} CM`;
+            const pmPct = (pmCount + cmCount) > 0 ? Math.round((pmCount / (pmCount + cmCount)) * 100) : 50;
+            document.getElementById('stat-pmcm-ratio').textContent = `${pmPct}% PM Ratio`;
 
-            // Needle angle formula: map 0-100% to -90deg (left) to 90deg (right)
-            setNeedleAngle('needle-total', 0); // Center position for Total
+            setNeedleAngle('needle-total', 0);
             setNeedleAngle('needle-done', (donePct * 1.8) - 90);
             setNeedleAngle('needle-notdone', (notDonePct * 1.8) - 90);
-            setNeedleAngle('needle-locations', (Math.min(locations * 10, 100) * 1.8) - 90);
+            // Map 0-100% PM to needle rotation (-90deg to +90deg)
+            setNeedleAngle('needle-pmcm', (pmPct * 1.8) - 90);
         }
 
         function setNeedleAngle(elementId, degrees) {
@@ -845,8 +971,11 @@
             document.getElementById('gauge-card-total').classList.remove('active-filter');
             document.getElementById('gauge-card-done').classList.remove('active-filter');
             document.getElementById('gauge-card-notdone').classList.remove('active-filter');
+            document.getElementById('gauge-card-pmcm').classList.remove('active-filter');
 
-            if (statusVal === 'DONE') {
+            if (selectedRepairType) {
+                document.getElementById('gauge-card-pmcm').classList.add('active-filter');
+            } else if (statusVal === 'DONE') {
                 document.getElementById('gauge-card-done').classList.add('active-filter');
             } else if (statusVal === 'NOT DONE') {
                 document.getElementById('gauge-card-notdone').classList.add('active-filter');
@@ -889,6 +1018,7 @@
 
             if (parsedDataList.length > 0) {
                 populateFilters();
+                autoSelectCurrentWeek(); // Set active week automatically upon load
                 updateTopHeaderInfo();
                 renderTable();
 
