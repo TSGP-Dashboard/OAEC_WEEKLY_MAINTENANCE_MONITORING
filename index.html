@@ -28,7 +28,7 @@
 
         html, body {
             height: 100vh;
-            overflow: hidden; /* Prevents whole-page scrolling */
+            overflow: hidden;
             background-color: var(--bg-main);
             color: var(--text-primary);
         }
@@ -699,8 +699,8 @@
             DATE_END: 3,
             REPAIR_TYPE: 4,
             REPAIR_DESC: 5,
-            LOCATION: 7,
-            DURATION: 6,
+            LOCATION: 6,
+            DURATION: 7,
             STATUS: 8,
             REMARKS: 9
         };
@@ -748,8 +748,8 @@
                         dateEnd: formatDate(row[COLUMN_MAP.DATE_END]),
                         repairType: String(row[COLUMN_MAP.REPAIR_TYPE] || '').trim(),
                         repairDesc: row[COLUMN_MAP.REPAIR_DESC] || '',
-                        duration: row[COLUMN_MAP.DURATION] || '',
                         location: row[COLUMN_MAP.LOCATION] || '',
+                        duration: row[COLUMN_MAP.DURATION] || '',
                         status: row[COLUMN_MAP.STATUS] || 'NOT DONE',
                         remarks: row[COLUMN_MAP.REMARKS] || ''
                     };
@@ -936,7 +936,10 @@
 
         function populateFilters() {
             const weeks = [...new Set(parsedDataList.map(r => r.week).filter(Boolean))].sort((a,b) => a - b);
-            const locations = [...new Set(parsedDataList.map(r => r.location).filter(Boolean))];
+            
+            // Filter out duration format values (e.g., "1 HOUR", "4hrs", "3days") from location filter dropdown
+            const locations = [...new Set(parsedDataList.map(r => r.location).filter(Boolean))]
+                .filter(loc => !/\b(hour|hours|hr|hrs|day|days)\b/i.test(loc));
 
             populateSelect('week-select', weeks, 'Week ');
             populateSelect('location-filter', locations);
@@ -944,13 +947,15 @@
 
         function populateSelect(selectId, values, prefix = '') {
             const select = document.getElementById(selectId);
+            // Clear existing options except first
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
             values.forEach(val => {
-                if (!select.querySelector(`option[value="${val}"]`)) {
-                    const opt = document.createElement('option');
-                    opt.value = val;
-                    opt.textContent = `${prefix}${val}`;
-                    select.appendChild(opt);
-                }
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.textContent = `${prefix}${val}`;
+                select.appendChild(opt);
             });
         }
 
