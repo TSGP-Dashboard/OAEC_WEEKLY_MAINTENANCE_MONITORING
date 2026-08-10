@@ -110,7 +110,7 @@
 
         .filters {
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
             flex-wrap: wrap;
             align-items: center;
         }
@@ -139,7 +139,7 @@
         }
 
         .btn {
-            padding: 0.6rem 1.5rem;
+            padding: 0.6rem 1.2rem;
             background: linear-gradient(135deg, #00ff96, #00cc7a);
             border: none;
             color: #0a0e27;
@@ -150,9 +150,26 @@
             transition: all 0.3s;
         }
 
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             box-shadow: 0 0 20px rgba(0, 255, 150, 0.5);
             transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-reset {
+            background: transparent;
+            border: 1px solid rgba(0, 255, 150, 0.4);
+            color: #00ff96;
+        }
+
+        .btn-reset:hover {
+            background: rgba(0, 255, 150, 0.15);
+            box-shadow: 0 0 10px rgba(0, 255, 150, 0.3);
         }
 
         .stats-grid {
@@ -210,46 +227,91 @@
         }
 
         td {
-            padding: 1rem;
+            padding: 0.8rem 1rem;
             border-bottom: 1px solid rgba(0, 255, 150, 0.1);
             color: #a0a0a0;
+            vertical-align: middle;
         }
 
         tbody tr:hover {
             background: rgba(0, 255, 150, 0.05);
         }
 
-        .status {
-            display: inline-block;
-            padding: 0.4rem 0.8rem;
+        /* Interactive Editable Table Controls */
+        .status-select {
+            padding: 0.4rem 0.6rem;
             border-radius: 4px;
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
         }
 
         .status-done {
             background: rgba(0, 255, 150, 0.2);
             color: #00ff96;
-            border: 1px solid rgba(0, 255, 150, 0.4);
+            border: 1px solid rgba(0, 255, 150, 0.5);
         }
 
         .status-notdone {
             background: rgba(255, 180, 0, 0.2);
             color: #ffb400;
-            border: 1px solid rgba(255, 180, 0, 0.4);
+            border: 1px solid rgba(255, 180, 0, 0.5);
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
+        .status-select option {
+            background: #0a0e27;
+            color: #e0e0e0;
+        }
+
+        .remarks-input {
+            width: 100%;
+            background: rgba(0, 255, 150, 0.03);
+            border: 1px solid rgba(0, 255, 150, 0.2);
+            border-radius: 4px;
+            padding: 0.4rem 0.6rem;
+            color: #e0e0e0;
+            font-size: 12px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .remarks-input:focus {
+            border-color: #00ff96;
+            background: rgba(0, 255, 150, 0.08);
+            box-shadow: 0 0 8px rgba(0, 255, 150, 0.2);
+        }
+
+        /* Pagination Layout */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 255, 150, 0.1);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .pagination-info {
+            font-size: 12px;
             color: #a0a0a0;
         }
 
-        .loading {
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        .empty-state, .loading {
             text-align: center;
-            padding: 2rem;
+            padding: 3rem;
             color: #a0a0a0;
         }
 
@@ -268,12 +330,15 @@
                 min-width: 120px;
             }
 
-            table {
-                font-size: 12px;
+            .pagination-container {
+                flex-direction: column;
+                align-items: flex-start;
             }
 
-            th, td {
-                padding: 0.7rem;
+            .pagination-controls {
+                margin-left: 0;
+                width: 100%;
+                justify-content: flex-end;
             }
         }
     </style>
@@ -313,7 +378,7 @@
             <!-- Repairs Table Card -->
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">Weekly Repairs</div>
+                    <div class="card-title">Weekly Repair Plan</div>
                     <div class="filters">
                         <select class="select-input" id="week-filter">
                             <option value="">All Weeks</option>
@@ -324,6 +389,7 @@
                         <select class="select-input" id="status-filter">
                             <option value="">All Status</option>
                         </select>
+                        <button class="btn btn-reset" onclick="resetDisplay()">Reset</button>
                         <button class="btn" onclick="exportData()">Export CSV</button>
                     </div>
                 </div>
@@ -333,21 +399,26 @@
                         <thead>
                             <tr>
                                 <th>Unit No</th>
-                                <th>Week</th>
-                                <th>Date Start</th>
-                                <th>Date End</th>
                                 <th>Repair Type</th>
-                                <th>Activity</th>
-                                <th>Location</th>
                                 <th>Duration</th>
+                                <th>Location</th>
                                 <th>Status</th>
                                 <th>Remarks</th>
                             </tr>
                         </thead>
                         <tbody id="table-body">
-                            <tr><td colspan="10" class="loading">Loading data...</td></tr>
+                            <tr><td colspan="6" class="loading">Loading data...</td></tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Pagination Footer -->
+                <div class="pagination-container">
+                    <div class="pagination-info" id="pagination-info">Showing 0 of 0 entries</div>
+                    <div class="pagination-controls">
+                        <button class="btn btn-reset" id="prev-btn" onclick="changePage(-1)" disabled>Previous</button>
+                        <button class="btn" id="next-btn" onclick="changePage(1)" disabled>Next</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -361,8 +432,8 @@
             API_URL: 'https://script.google.com/macros/s/AKfycbzs99Ftdsx8rPX10yVW_IUQ8rVP93OS8uDUisbmVp8grDlOaEVksW-sO14HprTeZQ/exec'
         };
 
-        // Aligning columns to image sheet format:
-        // Col A(0): UNIT NO | Col B(1): REPAIR TYPE | Col C(2): DURATION
+        // Simplified Column Mapping based on Weekly Repair Plan structure:
+        // Col A(0): UNIT NO | Col B(1): REPAIR TYPE | Col C(2): DURATION 
         // Col D(3): LOCATION | Col E(4): STATUS | Col F(5): REMARKS
         const COLUMN_MAP = {
             UNIT_NO: 0,
@@ -374,7 +445,9 @@
         };
 
         let globalMetaData = { week: '', dateStart: '', dateEnd: '' };
-        let globalRows = [];
+        let parsedDataList = []; // Holds structured objects
+        let currentPage = 1;
+        const PAGE_SIZE = 30;
 
         // ============================================
         // FETCH DATA
@@ -386,59 +459,106 @@
 
                 const rawData = await response.json();
                 
-                // Extract metadata from header block in sheet
+                // Extract metadata from header block
                 if (rawData.length >= 2) {
-                    globalMetaData.week = rawData[1]?.[1] || '';      // Row 2, Col B (Week Number)
-                    globalMetaData.dateStart = rawData[1]?.[2] || ''; // Row 2, Col C (Start Date)
-                    globalMetaData.dateEnd = rawData[1]?.[3] || '';   // Row 2, Col D (End Date)
+                    globalMetaData.week = rawData[1]?.[1] || '';      
+                    globalMetaData.dateStart = rawData[1]?.[2] || ''; 
+                    globalMetaData.dateEnd = rawData[1]?.[3] || '';   
                 }
 
-                // Table data starts at Row 5 (index 4)
-                return rawData.length > 4 ? rawData.slice(4) : [];
+                // Table rows start at index 4 (Row 5 in Google Sheet)
+                const dataRows = rawData.length > 4 ? rawData.slice(4) : [];
+                
+                // Parse rows into objects with explicit IDs for tracking edits
+                return dataRows.map((row, index) => {
+                    if (!row || row.length === 0 || !row[COLUMN_MAP.UNIT_NO]) return null;
+                    return {
+                        id: index,
+                        unitNo: row[COLUMN_MAP.UNIT_NO] || '',
+                        week: globalMetaData.week,
+                        repairType: row[COLUMN_MAP.REPAIR_TYPE] || '',
+                        duration: row[COLUMN_MAP.DURATION] || '',
+                        location: row[COLUMN_MAP.LOCATION] || '',
+                        status: row[COLUMN_MAP.STATUS] || 'NOT DONE',
+                        remarks: row[COLUMN_MAP.REMARKS] || ''
+                    };
+                }).filter(Boolean);
             } catch (error) {
                 console.error('Error loading data:', error);
-                showError('❌ Error loading data. Ensure Google Apps Script Web App is deployed as "Anyone".');
+                showError('❌ Error loading data. Ensure Google Apps Script is deployed.');
                 return [];
             }
         }
 
         // ============================================
-        // PARSE & FILTER
+        // FILTERING & PAGINATION LOGIC
         // ============================================
-        function parseRow(row) {
-            if (!row || row.length === 0 || !row[COLUMN_MAP.UNIT_NO]) return null;
+        function getFilteredData() {
+            const filters = getFilters();
+            return parsedDataList.filter(item => {
+                if (filters.week && String(item.week) !== String(filters.week)) return false;
+                if (filters.location && item.location !== filters.location) return false;
+                if (filters.status && item.status.toLowerCase() !== filters.status.toLowerCase()) return false;
+                return true;
+            });
+        }
 
+        function getFilters() {
             return {
-                unitNo: row[COLUMN_MAP.UNIT_NO] || '',
-                week: globalMetaData.week,
-                dateStart: globalMetaData.dateStart,
-                dateEnd: globalMetaData.dateEnd,
-                repairType: row[COLUMN_MAP.REPAIR_TYPE] || '',
-                activity: row[COLUMN_MAP.REPAIR_TYPE] || '',
-                location: row[COLUMN_MAP.LOCATION] || '',
-                duration: row[COLUMN_MAP.DURATION] || '',
-                status: row[COLUMN_MAP.STATUS] || '',
-                remarks: row[COLUMN_MAP.REMARKS] || ''
+                week: document.getElementById('week-filter').value,
+                location: document.getElementById('location-filter').value,
+                status: document.getElementById('status-filter').value
             };
         }
 
-        function filterRows(rows, filters = {}) {
-            return rows.map(parseRow).filter(parsed => {
-                if (!parsed) return false;
-                if (filters.week && String(parsed.week) !== String(filters.week)) return false;
-                if (filters.location && parsed.location !== filters.location) return false;
-                if (filters.status && parsed.status.toLowerCase() !== filters.status.toLowerCase()) return false;
-                return true;
-            });
+        function resetDisplay() {
+            document.getElementById('week-filter').value = '';
+            document.getElementById('location-filter').value = '';
+            document.getElementById('status-filter').value = '';
+            currentPage = 1;
+            renderTable();
+        }
+
+        function changePage(direction) {
+            const filtered = getFilteredData();
+            const totalPages = Math.ceil(filtered.length / PAGE_SIZE) || 1;
+            currentPage += direction;
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            renderTable();
+        }
+
+        // ============================================
+        // INLINE EDITING HANDLERS
+        // ============================================
+        function updateStatus(id, newStatus) {
+            const item = parsedDataList.find(d => d.id === id);
+            if (item) {
+                item.status = newStatus;
+                updateStats(getFilteredData());
+                // Re-apply class styling to the changed dropdown
+                const selectElem = document.getElementById(`status-select-${id}`);
+                if (selectElem) {
+                    const isDone = newStatus.toLowerCase() === 'done';
+                    selectElem.className = `status-select ${isDone ? 'status-done' : 'status-notdone'}`;
+                }
+            }
+        }
+
+        function updateRemarks(id, newRemarks) {
+            const item = parsedDataList.find(d => d.id === id);
+            if (item) {
+                item.remarks = newRemarks;
+            }
         }
 
         // ============================================
         // UI & RENDER FUNCTIONS
         // ============================================
-        function populateFilters(parsedRows) {
-            const weeks = [...new Set(parsedRows.map(r => r.week).filter(Boolean))];
-            const locations = [...new Set(parsedRows.map(r => r.location).filter(Boolean))];
-            const statuses = [...new Set(parsedRows.map(r => r.status).filter(Boolean))];
+        function populateFilters() {
+            const weeks = [...new Set(parsedDataList.map(r => r.week).filter(Boolean))];
+            const locations = [...new Set(parsedDataList.map(r => r.location).filter(Boolean))];
+            const statuses = [...new Set(parsedDataList.map(r => r.status).filter(Boolean))];
 
             populateSelect('week-filter', weeks);
             populateSelect('location-filter', locations);
@@ -457,51 +577,73 @@
             });
         }
 
-        function getFilters() {
-            return {
-                week: document.getElementById('week-filter').value,
-                location: document.getElementById('location-filter').value,
-                status: document.getElementById('status-filter').value
-            };
-        }
-
-        function renderTable(rows, filters = {}) {
-            const filtered = filterRows(rows, filters);
+        function renderTable() {
+            const filtered = getFilteredData();
             const tbody = document.getElementById('table-body');
+            const totalItems = filtered.length;
+            const totalPages = Math.ceil(totalItems / PAGE_SIZE) || 1;
 
-            if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No repairs found matching your filters</td></tr>';
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIdx = (currentPage - 1) * PAGE_SIZE;
+            const endIdx = Math.min(startIdx + PAGE_SIZE, totalItems);
+            const pageData = filtered.slice(startIdx, endIdx);
+
+            if (totalItems === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No repairs found matching your filters</td></tr>';
+                document.getElementById('pagination-info').textContent = 'Showing 0 of 0 entries';
+                document.getElementById('prev-btn').disabled = true;
+                document.getElementById('next-btn').disabled = true;
                 updateStats([]);
                 return;
             }
 
-            tbody.innerHTML = filtered.map(parsed => {
-                const isDone = parsed.status.toLowerCase() === 'done';
+            tbody.innerHTML = pageData.map(item => {
+                const isDone = item.status.toLowerCase() === 'done';
                 const statusClass = isDone ? 'status-done' : 'status-notdone';
+
                 return `
                     <tr>
-                        <td>${parsed.unitNo}</td>
-                        <td>${parsed.week}</td>
-                        <td>${parsed.dateStart}</td>
-                        <td>${parsed.dateEnd}</td>
-                        <td>${parsed.repairType}</td>
-                        <td>${parsed.activity}</td>
-                        <td>${parsed.location}</td>
-                        <td>${parsed.duration}</td>
-                        <td><span class="status ${statusClass}">${parsed.status}</span></td>
-                        <td>${parsed.remarks}</td>
+                        <td><strong>${item.unitNo}</strong></td>
+                        <td>${item.repairType}</td>
+                        <td>${item.duration}</td>
+                        <td>${item.location}</td>
+                        <td>
+                            <select 
+                                id="status-select-${item.id}"
+                                class="status-select ${statusClass}" 
+                                onchange="updateStatus(${item.id}, this.value)"
+                            >
+                                <option value="DONE" ${isDone ? 'selected' : ''}>DONE</option>
+                                <option value="NOT DONE" ${!isDone ? 'selected' : ''}>NOT DONE</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input 
+                                type="text" 
+                                class="remarks-input" 
+                                value="${item.remarks}" 
+                                placeholder="Add remarks..."
+                                onchange="updateRemarks(${item.id}, this.value)"
+                            />
+                        </td>
                     </tr>
                 `;
             }).join('');
 
+            // Update Pagination Controls
+            document.getElementById('pagination-info').textContent = `Showing ${startIdx + 1} to ${endIdx} of ${totalItems} entries (Page ${currentPage} of ${totalPages})`;
+            document.getElementById('prev-btn').disabled = currentPage === 1;
+            document.getElementById('next-btn').disabled = currentPage === totalPages;
+
             updateStats(filtered);
         }
 
-        function updateStats(parsedRows) {
-            const total = parsedRows.length;
-            const done = parsedRows.filter(r => r.status.toLowerCase() === 'done').length;
-            const notDone = parsedRows.filter(r => r.status.toLowerCase() !== 'done').length;
-            const locations = new Set(parsedRows.map(r => r.location)).size;
+        function updateStats(filteredData) {
+            const total = filteredData.length;
+            const done = filteredData.filter(r => r.status.toLowerCase() === 'done').length;
+            const notDone = filteredData.filter(r => r.status.toLowerCase() !== 'done').length;
+            const locations = new Set(filteredData.map(r => r.location)).size;
 
             document.getElementById('stat-total').textContent = total;
             document.getElementById('stat-done').textContent = done;
@@ -510,30 +652,26 @@
         }
 
         function showError(message) {
-            document.getElementById('table-body').innerHTML = `<tr><td colspan="10" class="empty-state">${message}</td></tr>`;
+            document.getElementById('table-body').innerHTML = `<tr><td colspan="6" class="empty-state">${message}</td></tr>`;
         }
 
         // ============================================
         // EXPORT TO CSV
         // ============================================
         function exportData() {
-            const filtered = filterRows(globalRows, getFilters());
+            const filtered = getFilteredData();
             if (filtered.length === 0) return;
 
-            const headers = ['Unit No', 'Week', 'Date Start', 'Date End', 'Repair Type', 'Activity', 'Location', 'Duration', 'Status', 'Remarks'];
+            const headers = ['Unit No', 'Repair Type', 'Duration', 'Location', 'Status', 'Remarks'];
             const csvContent = [
                 headers.join(','),
-                ...filtered.map(parsed => [
-                    parsed.unitNo,
-                    parsed.week,
-                    parsed.dateStart,
-                    parsed.dateEnd,
-                    parsed.repairType,
-                    parsed.activity,
-                    parsed.location,
-                    parsed.duration,
-                    parsed.status,
-                    parsed.remarks
+                ...filtered.map(item => [
+                    item.unitNo,
+                    item.repairType,
+                    item.duration,
+                    item.location,
+                    item.status,
+                    item.remarks
                 ].map(v => `"${v}"`).join(','))
             ].join('\n');
 
@@ -541,7 +679,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `repairs_${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `weekly_repairs_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
         }
 
@@ -549,16 +687,16 @@
         // INITIALIZE
         // ============================================
         async function init() {
-            globalRows = await fetchFromSheets();
-            const parsedRows = globalRows.map(parseRow).filter(Boolean);
+            parsedDataList = await fetchFromSheets();
 
-            if (parsedRows.length > 0) {
-                populateFilters(parsedRows);
-                renderTable(globalRows);
+            if (parsedDataList.length > 0) {
+                populateFilters();
+                renderTable();
 
                 ['week-filter', 'location-filter', 'status-filter'].forEach(id => {
                     document.getElementById(id).addEventListener('change', () => {
-                        renderTable(globalRows, getFilters());
+                        currentPage = 1; // Reset to first page on filter change
+                        renderTable();
                     });
                 });
             } else {
