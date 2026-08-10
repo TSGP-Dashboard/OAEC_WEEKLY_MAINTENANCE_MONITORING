@@ -358,44 +358,46 @@
         // DATABASE CONFIGURATION
         // ============================================
         const DB_CONFIG = {
-            SHEET_ID: 'weekly_repair_db',
-            API_KEY: 'https://script.google.com/macros/s/AKfycbyM48pYrPsK7mmbIlLQv4nV94q-8rs9ltiAERnx7s-zRVYGcAnMX9vxubU-cD_uqnNK5g/exec',
-            SHEET_NAME: 'Sheet1'
+            API_URL: 'https://script.google.com/macros/s/AKfycbzs99Ftdsx8rPX10yVW_IUQ8rVP93OS8uDUisbmVp8grDlOaEVksW-sO14HprTeZQ/exec'
         };
 
+        // Aligning columns to image sheet format:
+        // Col A(0): UNIT NO | Col B(1): REPAIR TYPE | Col C(2): DURATION
+        // Col D(3): LOCATION | Col E(4): STATUS | Col F(5): REMARKS
         const COLUMN_MAP = {
             UNIT_NO: 0,
-            WEEK: 1,
-            DATE_START: 2,
-            DATE_END: 3,
-            REPAIR_TYPE: 4,
-            ACTIVITY: 5,
-            LOCATION: 7,
-            DURATION: 8,
-            STATUS: 9,
-            REMARKS: 10
+            REPAIR_TYPE: 1,
+            DURATION: 2,
+            LOCATION: 3,
+            STATUS: 4,
+            REMARKS: 5
         };
+
+        let globalMetaData = { week: '', dateStart: '', dateEnd: '' };
+        let globalRows = [];
 
         // ============================================
         // FETCH DATA
         // ============================================
         async function fetchFromSheets() {
             try {
-                if (DB_CONFIG.SHEET_ID === 'YOUR_SHEET_ID' || DB_CONFIG.API_KEY === 'YOUR_API_KEY') {
-                    showError('⚠️ Please configure SHEET_ID and API_KEY in the code');
-                    return [];
-                }
-
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${DB_CONFIG.SHEET_ID}/values/${DB_CONFIG.SHEET_NAME}?key=${DB_CONFIG.API_KEY}`;
-                const response = await fetch(url);
-
+                const response = await fetch(DB_CONFIG.API_URL);
                 if (!response.ok) throw new Error(`API Error: ${response.status}`);
 
-                const data = await response.json();
-                return data.values || [];
+                const rawData = await response.json();
+                
+                // Extract metadata from header block in sheet
+                if (rawData.length >= 2) {
+                    globalMetaData.week = rawData[1]?.[1] || '';      // Row 2, Col B (Week Number)
+                    globalMetaData.dateStart = rawData[1]?.[2] || ''; // Row 2, Col C (Start Date)
+                    globalMetaData.dateEnd = rawData[1]?.[3] || '';   // Row 2, Col D (End Date)
+                }
+
+                // Table data starts at Row 5 (index 4)
+                return rawData.length > 4 ? rawData.slice(4) : [];
             } catch (error) {
-                console.error('Error:', error);
-                showError('❌ Error loading data. Check your configuration.');
+                console.error('Error loading data:', error);
+                showError('❌ Error loading data. Ensure Google Apps Script Web App is deployed as "Anyone".');
                 return [];
             }
         }
@@ -404,15 +406,15 @@
         // PARSE & FILTER
         // ============================================
         function parseRow(row) {
-            if (!row || row.length < 11) return null;
+            if (!row || row.length === 0 || !row[COLUMN_MAP.UNIT_NO]) return null;
 
             return {
                 unitNo: row[COLUMN_MAP.UNIT_NO] || '',
-                week: row[COLUMN_MAP.WEEK] || '',
-                dateStart: row[COLUMN_MAP.DATE_START] || '',
-                dateEnd: row[COLUMN_MAP.DATE_END] || '',
+                week: globalMetaData.week,
+                dateStart: globalMetaData.dateStart,
+                dateEnd: globalMetaData.dateEnd,
                 repairType: row[COLUMN_MAP.REPAIR_TYPE] || '',
-                activity: row[COLUMN_MAP.ACTIVITY] || '',
+                activity: row[COLUMN_MAP.REPAIR_TYPE] || '',
                 location: row[COLUMN_MAP.LOCATION] || '',
                 duration: row[COLUMN_MAP.DURATION] || '',
                 status: row[COLUMN_MAP.STATUS] || '',
@@ -421,53 +423,22 @@
         }
 
         function filterRows(rows, filters = {}) {
-            let filtered = rows;
-
-            if (filters.week) {
-                filtered = filtered.filter(row => {
-                    const parsed = parseRow(row);
-                    return parsed && String(parsed.week) === String(filters.week);
-                });
-            }
-
-            if (filters.location) {
-                filtered = filtered.filter(row => {
-                    const parsed = parseRow(row);
-                    return parsed && parsed.location === filters.location;
-                });
-            }
-
-            if (filters.status) {
-                filtered = filtered.filter(row => {
-                    const parsed = parseRow(row);
-                    return parsed && parsed.status === filters.status;
-                });
-            }
-
-            return filtered;
-        }
-
-        // ============================================
-        // GET UNIQUE VALUES FOR FILTERS
-        // ============================================
-        function getUniqueValues(rows, key) {
-            const values = new Set();
-            rows.forEach(row => {
-                const parsed = parseRow(row);
-                if (parsed && parsed[key]) {
-                    values.add(parsed[key]);
-                }
+            return rows.map(parseRow).filter(parsed => {
+                if (!parsed) return false;
+                if (filters.week && String(parsed.week) !== String(filters.week)) return false;
+                if (filters.location && parsed.location !== filters.location) return false;
+                if (filters.status && parsed.status.toLowerCase() !== filters.status.toLowerCase()) return false;
+                return true;
             });
-            return Array.from(values).sort();
         }
 
         // ============================================
-        // UI FUNCTIONS
+        // UI & RENDER FUNCTIONS
         // ============================================
-        function populateFilters(rows) {
-            const weeks = getUniqueValues(rows, 'week');
-            const locations = getUniqueValues(rows, 'location');
-            const statuses = getUniqueValues(rows, 'status');
+        function populateFilters(parsedRows) {
+            const weeks = [...new Set(parsedRows.map(r => r.week).filter(Boolean))];
+            const locations = [...new Set(parsedRows.map(r => r.location).filter(Boolean))];
+            const statuses = [...new Set(parsedRows.map(r => r.status).filter(Boolean))];
 
             populateSelect('week-filter', weeks);
             populateSelect('location-filter', locations);
@@ -476,18 +447,14 @@
 
         function populateSelect(selectId, values) {
             const select = document.getElementById(selectId);
-            const currentValue = select.value;
-
-            values.forEach(value => {
-                if (!select.querySelector(`option[value="${value}"]`)) {
-                    const option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    select.appendChild(option);
+            values.forEach(val => {
+                if (!select.querySelector(`option[value="${val}"]`)) {
+                    const opt = document.createElement('option');
+                    opt.value = val;
+                    opt.textContent = val;
+                    select.appendChild(opt);
                 }
             });
-
-            select.value = currentValue;
         }
 
         function getFilters() {
@@ -504,15 +471,13 @@
 
             if (filtered.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No repairs found matching your filters</td></tr>';
-                updateStats(rows, filters);
+                updateStats([]);
                 return;
             }
 
-            const html = filtered.map(row => {
-                const parsed = parseRow(row);
-                if (!parsed) return '';
-
-                const statusClass = parsed.status.toLowerCase() === 'done' ? 'status-done' : 'status-notdone';
+            tbody.innerHTML = filtered.map(parsed => {
+                const isDone = parsed.status.toLowerCase() === 'done';
+                const statusClass = isDone ? 'status-done' : 'status-notdone';
                 return `
                     <tr>
                         <td>${parsed.unitNo}</td>
@@ -529,18 +494,14 @@
                 `;
             }).join('');
 
-            tbody.innerHTML = html;
-            updateStats(rows, filters);
+            updateStats(filtered);
         }
 
-        function updateStats(allRows, filters = {}) {
-            const filtered = filterRows(allRows.slice(1), filters);
-            const parsed = filtered.map(parseRow).filter(r => r !== null);
-
-            const total = parsed.length;
-            const done = parsed.filter(r => r.status.toLowerCase() === 'done').length;
-            const notDone = parsed.filter(r => r.status.toLowerCase() === 'not done').length;
-            const locations = new Set(parsed.map(r => r.location)).size;
+        function updateStats(parsedRows) {
+            const total = parsedRows.length;
+            const done = parsedRows.filter(r => r.status.toLowerCase() === 'done').length;
+            const notDone = parsedRows.filter(r => r.status.toLowerCase() !== 'done').length;
+            const locations = new Set(parsedRows.map(r => r.location)).size;
 
             document.getElementById('stat-total').textContent = total;
             document.getElementById('stat-done').textContent = done;
@@ -549,37 +510,31 @@
         }
 
         function showError(message) {
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = `<tr><td colspan="10" class="empty-state">${message}</td></tr>`;
+            document.getElementById('table-body').innerHTML = `<tr><td colspan="10" class="empty-state">${message}</td></tr>`;
         }
 
         // ============================================
         // EXPORT TO CSV
         // ============================================
         function exportData() {
-            const rows = globalRows;
-            const filters = getFilters();
-            const filtered = filterRows(rows.slice(1), filters);
+            const filtered = filterRows(globalRows, getFilters());
+            if (filtered.length === 0) return;
 
             const headers = ['Unit No', 'Week', 'Date Start', 'Date End', 'Repair Type', 'Activity', 'Location', 'Duration', 'Status', 'Remarks'];
             const csvContent = [
                 headers.join(','),
-                ...filtered.map(row => {
-                    const parsed = parseRow(row);
-                    if (!parsed) return '';
-                    return [
-                        parsed.unitNo,
-                        parsed.week,
-                        parsed.dateStart,
-                        parsed.dateEnd,
-                        parsed.repairType,
-                        parsed.activity,
-                        parsed.location,
-                        parsed.duration,
-                        parsed.status,
-                        parsed.remarks
-                    ].map(v => `"${v}"`).join(',');
-                })
+                ...filtered.map(parsed => [
+                    parsed.unitNo,
+                    parsed.week,
+                    parsed.dateStart,
+                    parsed.dateEnd,
+                    parsed.repairType,
+                    parsed.activity,
+                    parsed.location,
+                    parsed.duration,
+                    parsed.status,
+                    parsed.remarks
+                ].map(v => `"${v}"`).join(','))
             ].join('\n');
 
             const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -593,21 +548,21 @@
         // ============================================
         // INITIALIZE
         // ============================================
-        let globalRows = [];
-
         async function init() {
             globalRows = await fetchFromSheets();
+            const parsedRows = globalRows.map(parseRow).filter(Boolean);
 
-            if (globalRows.length > 1) {
-                populateFilters(globalRows.slice(1));
-                renderTable(globalRows.slice(1));
+            if (parsedRows.length > 0) {
+                populateFilters(parsedRows);
+                renderTable(globalRows);
 
-                // Add filter listeners
                 ['week-filter', 'location-filter', 'status-filter'].forEach(id => {
                     document.getElementById(id).addEventListener('change', () => {
-                        renderTable(globalRows.slice(1), getFilters());
+                        renderTable(globalRows, getFilters());
                     });
                 });
+            } else {
+                showError('No valid repair data found.');
             }
         }
 
