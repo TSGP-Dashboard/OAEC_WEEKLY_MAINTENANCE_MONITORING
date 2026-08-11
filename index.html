@@ -508,7 +508,154 @@
             color: var(--text-muted);
             font-style: italic;
         }
-    </style>
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--panel-bg);
+            border: 2px solid var(--accent-blue);
+            border-radius: 8px;
+            width: 95%;
+            max-width: 400px;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: var(--accent-blue);
+            color: white;
+            padding: 1.25rem;
+            font-weight: 700;
+            text-align: center;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-section label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-check {
+            font-size: 2.5rem;
+            color: var(--accent-green);
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-status {
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .modal-pic {
+            background: var(--bg-main);
+            border: 1px solid var(--panel-border);
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--panel-border);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: var(--bg-main);
+            color: var(--text-primary);
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px var(--active-ring);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--panel-border);
+            justify-content: flex-end;
+        }
+
+        .modal-btn-cancel {
+            padding: 0.6rem 1.2rem;
+            background: var(--panel-border);
+            color: var(--text-primary);
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #cbd5e1;
+        }
+
+        .modal-btn-save {
+            padding: 0.6rem 1.2rem;
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .remarks-input-box:disabled {
+            background-color: #e2e8f0;
+            color: #64748b;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .status-dropdown:disabled {
+            background-color: #d1fae5;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
 </head>
 <body>
 
@@ -685,6 +832,33 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Update Equipment Modal -->
+        <div id="update-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">UPDATE EQUIPMENT</div>
+                <div class="modal-body">
+                    <div class="modal-section">
+                        <div class="modal-check">✓</div>
+                        <div class="modal-status">DONE</div>
+                    </div>
+                    <div class="modal-section">
+                        <label>UPDATED BY</label>
+                        <div class="modal-pic" id="modal-pic-name"></div>
+                    </div>
+                    <div class="modal-section">
+                        <label>DATE</label>
+                        <input type="date" id="modal-date-input" class="modal-input">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn-cancel" onclick="closeUpdateModal()">CANCEL</button>
+                    <button class="modal-btn-save" onclick="saveUpdateModal()">SAVE</button>
+                </div>
+            </div>
+        </div>
+        <!-- Modal Overlay -->
+        <div id="modal-overlay" class="modal-overlay" style="display: none;" onclick="closeUpdateModal()"></div>
     </main>
 
     <script>
@@ -699,16 +873,21 @@
             DATE_END: 3,
             REPAIR_TYPE: 4,
             REPAIR_DESC: 5,
-            LOCATION: 7,
             DURATION: 6,
+            LOCATION: 7,
             STATUS: 8,
-            REMARKS: 9
+            PIC: 9,              // Person In Charge (Column J)
+            REMARKS: 10          // Moved to Column K
         };
 
         let parsedDataList = [];
         let currentPage = 1;
         const PAGE_SIZE = 25;
         let selectedRepairType = '';
+        
+        // Modal state tracking
+        let pendingUpdateId = null;
+        let pendingNewStatus = null;
 
         function parseRawDate(rawDate) {
             if (!rawDate) return null;
@@ -751,6 +930,7 @@
                         location: row[COLUMN_MAP.LOCATION] || '',
                         duration: row[COLUMN_MAP.DURATION] || '',
                         status: row[COLUMN_MAP.STATUS] || 'NOT DONE',
+                        pic: row[COLUMN_MAP.PIC] || '',
                         remarks: row[COLUMN_MAP.REMARKS] || ''
                     };
                 }).filter(Boolean);
@@ -801,18 +981,102 @@
 
         async function updateStatus(id, newStatus) {
             const item = parsedDataList.find(d => d.id === id);
-            if (item) {
-                item.status = newStatus;
-                updateStatsAndGauges(getFilteredData());
-                
+            if (!item) return;
+
+            // If changing TO "DONE", show the modal
+            if (newStatus.toUpperCase() === 'DONE' && item.status.toLowerCase() !== 'done') {
+                // Reset to previous status first
                 const selectElem = document.getElementById(`status-select-${id}`);
                 if (selectElem) {
-                    const isDone = newStatus.toLowerCase() === 'done';
-                    selectElem.className = `status-dropdown ${isDone ? 'status-done' : 'status-notdone'}`;
+                    selectElem.value = item.status;
                 }
-
-                await updateRowInSheet(item);
+                
+                // Show modal with PIC info
+                pendingUpdateId = id;
+                pendingNewStatus = newStatus;
+                showUpdateModal(item);
+                return;
             }
+
+            // Normal update for other status changes
+            item.status = newStatus;
+            updateStatsAndGauges(getFilteredData());
+            
+            const selectElem = document.getElementById(`status-select-${id}`);
+            if (selectElem) {
+                const isDone = newStatus.toLowerCase() === 'done';
+                selectElem.className = `status-dropdown ${isDone ? 'status-done' : 'status-notdone'}`;
+                if (isDone) {
+                    selectElem.disabled = true;
+                }
+            }
+
+            await updateRowInSheet(item);
+        }
+
+        function showUpdateModal(item) {
+            // Set PIC name in modal
+            document.getElementById('modal-pic-name').textContent = item.pic || 'Not Assigned';
+            
+            // Set today's date as default
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0];
+            document.getElementById('modal-date-input').value = dateStr;
+            
+            // Show modal
+            document.getElementById('update-modal').style.display = 'block';
+            document.getElementById('modal-overlay').style.display = 'block';
+        }
+
+        function closeUpdateModal() {
+            document.getElementById('update-modal').style.display = 'none';
+            document.getElementById('modal-overlay').style.display = 'none';
+            pendingUpdateId = null;
+            pendingNewStatus = null;
+        }
+
+        async function saveUpdateModal() {
+            if (pendingUpdateId === null) return;
+
+            const item = parsedDataList.find(d => d.id === pendingUpdateId);
+            if (!item) {
+                closeUpdateModal();
+                return;
+            }
+
+            // Get the date from modal
+            const dateInput = document.getElementById('modal-date-input').value;
+
+            // Update status to DONE
+            item.status = pendingNewStatus;
+            
+            // Auto-fill remarks with "as per [PIC NAME]"
+            const picName = item.pic || 'Unknown';
+            item.remarks = `as per ${picName}`;
+
+            // Update UI
+            const selectElem = document.getElementById(`status-select-${pendingUpdateId}`);
+            if (selectElem) {
+                selectElem.value = 'DONE';
+                selectElem.className = 'status-dropdown status-done';
+                selectElem.disabled = true;  // Lock the dropdown
+            }
+
+            // Update remarks display
+            const remarksInput = document.querySelector(`input[id="remarks-${pendingUpdateId}"]`);
+            if (remarksInput) {
+                remarksInput.value = item.remarks;
+                remarksInput.disabled = true;  // Lock remarks input
+            }
+
+            // Update stats
+            updateStatsAndGauges(getFilteredData());
+
+            // Save to sheet
+            await updateRowInSheet(item);
+
+            // Close modal
+            closeUpdateModal();
         }
 
         async function updateRemarks(id, newRemarks) {
@@ -937,12 +1201,13 @@
         function populateFilters() {
             const weeks = [...new Set(parsedDataList.map(r => r.week).filter(Boolean))].sort((a,b) => a - b);
             
-            // Filter out duration format values (e.g., "1 HOUR", "4hrs", "3days") from location filter dropdown
+            // Filter out duration format values (e.g., "1 HOUR", "4hrs", "3days", "5 MINS") from location filter dropdown
             const locations = [...new Set(parsedDataList.map(r => r.location).filter(Boolean))]
                 .filter(loc => {
-    const durationPattern = /^\d+\s*(hour|hours|hr|hrs|day|days|min|mins|minute|minutes)\s*$/i;
-    return !durationPattern.test(loc.trim());
-        });
+                    // Remove entries that are purely duration formats
+                    const durationPattern = /^\d+\s*(hour|hours|hr|hrs|day|days|min|mins|minute|minutes)\s*$/i;
+                    return !durationPattern.test(loc.trim());
+                });
 
             populateSelect('week-select', weeks, 'Week ');
             populateSelect('location-filter', locations);
@@ -989,6 +1254,12 @@
                 const isPM = item.repairType.toUpperCase().includes('PM');
                 const typeClass = isPM ? 'type-tag-pm' : 'type-tag-cm';
 
+                // Pre-fill remarks if DONE and no custom remarks
+                let displayRemarks = item.remarks;
+                if (isDone && !displayRemarks) {
+                    displayRemarks = `as per ${item.pic || 'Unknown'}`;
+                }
+
                 return `
                     <tr>
                         <td class="unit-cell">${item.unitNo}</td>
@@ -1001,6 +1272,7 @@
                                 id="status-select-${item.id}"
                                 class="status-dropdown ${statusClass}" 
                                 onchange="updateStatus(${item.id}, this.value)"
+                                ${isDone ? 'disabled' : ''}
                             >
                                 <option value="DONE" ${isDone ? 'selected' : ''}>DONE</option>
                                 <option value="NOT DONE" ${!isDone ? 'selected' : ''}>NOT DONE</option>
@@ -1008,11 +1280,13 @@
                         </td>
                         <td>
                             <input 
+                                id="remarks-${item.id}"
                                 type="text" 
                                 class="remarks-input-box" 
-                                value="${item.remarks}" 
+                                value="${displayRemarks}" 
                                 placeholder="Enter remarks..."
                                 onchange="updateRemarks(${item.id}, this.value)"
+                                ${isDone ? 'disabled' : ''}
                             />
                         </td>
                     </tr>
