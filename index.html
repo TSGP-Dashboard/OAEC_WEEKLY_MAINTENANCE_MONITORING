@@ -509,7 +509,6 @@
             font-style: italic;
         }
 
-        /* Modal Styles */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -602,12 +601,6 @@
             color: var(--text-primary);
         }
 
-        .modal-input:focus {
-            outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px var(--active-ring);
-        }
-
         .modal-footer {
             display: flex;
             gap: 0.75rem;
@@ -625,7 +618,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            font-size: 0.9rem;
         }
 
         .modal-btn-cancel:hover {
@@ -641,7 +633,11 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            font-size: 0.9rem;
+        }
+
+        .modal-btn-save:hover {
+            background: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .remarks-input-box:disabled {
@@ -656,6 +652,7 @@
             cursor: not-allowed;
             opacity: 0.8;
         }
+    </style>
 </head>
 <body>
 
@@ -832,38 +829,35 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Update Equipment Modal -->
-        <div id="update-modal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">UPDATE EQUIPMENT</div>
-                <div class="modal-body">
-                    <div class="modal-section">
-                        <div class="modal-check">✓</div>
-                        <div class="modal-status">DONE</div>
-                    </div>
-                    <div class="modal-section">
-                        <label>UPDATED BY</label>
-                        <div class="modal-pic" id="modal-pic-name"></div>
-                    </div>
-                    <div class="modal-section">
-                        <label>DATE</label>
-                        <input type="date" id="modal-date-input" class="modal-input">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="modal-btn-cancel" onclick="closeUpdateModal()">CANCEL</button>
-                    <button class="modal-btn-save" onclick="saveUpdateModal()">SAVE</button>
-                </div>
+    </main>
+
+    <!-- Update Equipment Modal -->
+    <div id="update-modal" class="modal" style="display: none;">
+        <div class="modal-header">UPDATE EQUIPMENT</div>
+        <div class="modal-body">
+            <div class="modal-section">
+                <div class="modal-check">✓</div>
+                <div class="modal-status">DONE</div>
+            </div>
+            <div class="modal-section">
+                <label>UPDATED BY</label>
+                <div class="modal-pic" id="modal-pic-name"></div>
+            </div>
+            <div class="modal-section">
+                <label>DATE</label>
+                <input type="date" id="modal-date-input" class="modal-input">
             </div>
         </div>
-        <!-- Modal Overlay -->
-        <div id="modal-overlay" class="modal-overlay" style="display: none;" onclick="closeUpdateModal()"></div>
-    </main>
+        <div class="modal-footer">
+            <button class="modal-btn-cancel" onclick="closeUpdateModal()">CANCEL</button>
+            <button class="modal-btn-save" onclick="saveUpdateModal()">SAVE</button>
+        </div>
+    </div>
+    <div id="modal-overlay" class="modal-overlay" style="display: none;" onclick="closeUpdateModal()"></div>
 
     <script>
         const DB_CONFIG = {
-            API_URL: 'https://script.google.com/macros/s/AKfycbydemZ2M6VMrpqAjaDXpjO2ufJ5pZoIN7Gs33-HmM2nLwFe9qFI4TeUfb8LM8_BihT23g/exec'
+            API_URL: 'https://script.google.com/macros/s/AKfycbxhFSMO4tPU2UnhYoVuajhpKZWHFrDeKCbMi0kFP7NGEkZAAbqBEP2K0jSPPpNYNOejSA/exec'
         };
 
         const COLUMN_MAP = {
@@ -877,15 +871,13 @@
             LOCATION: 7,
             STATUS: 8,
             PIC: 9,              // Person In Charge (Column J)
-            REMARKS: 10          // Moved to Column K
+            REMARKS: 10          // Column K
         };
 
         let parsedDataList = [];
         let currentPage = 1;
         const PAGE_SIZE = 25;
         let selectedRepairType = '';
-        
-        // Modal state tracking
         let pendingUpdateId = null;
         let pendingNewStatus = null;
 
@@ -983,22 +975,16 @@
             const item = parsedDataList.find(d => d.id === id);
             if (!item) return;
 
-            // If changing TO "DONE", show the modal
             if (newStatus.toUpperCase() === 'DONE' && item.status.toLowerCase() !== 'done') {
-                // Reset to previous status first
                 const selectElem = document.getElementById(`status-select-${id}`);
-                if (selectElem) {
-                    selectElem.value = item.status;
-                }
+                if (selectElem) selectElem.value = item.status;
                 
-                // Show modal with PIC info
                 pendingUpdateId = id;
                 pendingNewStatus = newStatus;
                 showUpdateModal(item);
                 return;
             }
 
-            // Normal update for other status changes
             item.status = newStatus;
             updateStatsAndGauges(getFilteredData());
             
@@ -1006,24 +992,17 @@
             if (selectElem) {
                 const isDone = newStatus.toLowerCase() === 'done';
                 selectElem.className = `status-dropdown ${isDone ? 'status-done' : 'status-notdone'}`;
-                if (isDone) {
-                    selectElem.disabled = true;
-                }
+                if (isDone) selectElem.disabled = true;
             }
 
             await updateRowInSheet(item);
         }
 
         function showUpdateModal(item) {
-            // Set PIC name in modal
             document.getElementById('modal-pic-name').textContent = item.pic || 'Not Assigned';
-            
-            // Set today's date as default
             const today = new Date();
             const dateStr = today.toISOString().split('T')[0];
             document.getElementById('modal-date-input').value = dateStr;
-            
-            // Show modal
             document.getElementById('update-modal').style.display = 'block';
             document.getElementById('modal-overlay').style.display = 'block';
         }
@@ -1037,45 +1016,28 @@
 
         async function saveUpdateModal() {
             if (pendingUpdateId === null) return;
-
             const item = parsedDataList.find(d => d.id === pendingUpdateId);
-            if (!item) {
-                closeUpdateModal();
-                return;
-            }
+            if (!item) { closeUpdateModal(); return; }
 
-            // Get the date from modal
-            const dateInput = document.getElementById('modal-date-input').value;
-
-            // Update status to DONE
             item.status = pendingNewStatus;
-            
-            // Auto-fill remarks with "as per [PIC NAME]"
             const picName = item.pic || 'Unknown';
             item.remarks = `as per ${picName}`;
 
-            // Update UI
             const selectElem = document.getElementById(`status-select-${pendingUpdateId}`);
             if (selectElem) {
                 selectElem.value = 'DONE';
                 selectElem.className = 'status-dropdown status-done';
-                selectElem.disabled = true;  // Lock the dropdown
+                selectElem.disabled = true;
             }
 
-            // Update remarks display
             const remarksInput = document.querySelector(`input[id="remarks-${pendingUpdateId}"]`);
             if (remarksInput) {
                 remarksInput.value = item.remarks;
-                remarksInput.disabled = true;  // Lock remarks input
+                remarksInput.disabled = true;
             }
 
-            // Update stats
             updateStatsAndGauges(getFilteredData());
-
-            // Save to sheet
             await updateRowInSheet(item);
-
-            // Close modal
             closeUpdateModal();
         }
 
@@ -1201,13 +1163,9 @@
         function populateFilters() {
             const weeks = [...new Set(parsedDataList.map(r => r.week).filter(Boolean))].sort((a,b) => a - b);
             
-            // Filter out duration format values (e.g., "1 HOUR", "4hrs", "3days", "5 MINS") from location filter dropdown
+            // Filter out duration format values (e.g., "1 HOUR", "4hrs", "3days") from location filter dropdown
             const locations = [...new Set(parsedDataList.map(r => r.location).filter(Boolean))]
-                .filter(loc => {
-                    // Remove entries that are purely duration formats
-                    const durationPattern = /^\d+\s*(hour|hours|hr|hrs|day|days|min|mins|minute|minutes)\s*$/i;
-                    return !durationPattern.test(loc.trim());
-                });
+                .filter(loc => !/\b(hour|hours|hr|hrs|day|days)\b/i.test(loc));
 
             populateSelect('week-select', weeks, 'Week ');
             populateSelect('location-filter', locations);
@@ -1253,12 +1211,7 @@
                 const statusClass = isDone ? 'status-done' : 'status-notdone';
                 const isPM = item.repairType.toUpperCase().includes('PM');
                 const typeClass = isPM ? 'type-tag-pm' : 'type-tag-cm';
-
-                // Pre-fill remarks if DONE and no custom remarks
-                let displayRemarks = item.remarks;
-                if (isDone && !displayRemarks) {
-                    displayRemarks = `as per ${item.pic || 'Unknown'}`;
-                }
+                const displayRemarks = isDone && !item.remarks ? `as per ${item.pic || 'Unknown'}` : item.remarks;
 
                 return `
                     <tr>
