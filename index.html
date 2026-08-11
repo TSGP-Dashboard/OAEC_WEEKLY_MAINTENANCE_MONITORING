@@ -899,9 +899,19 @@
                 const response = await fetch(DB_CONFIG.API_URL);
                 if (!response.ok) throw new Error(`API Response Error: ${response.status}`);
 
-                const rawData = await response.json();
-                const hasHeader = rawData.length > 0 && String(rawData[0][0]).toLowerCase().includes('unit');
-                const rows = hasHeader ? rawData.slice(1) : rawData;
+                const data = await response.json();
+                console.log('Raw data from API:', data);
+
+                // Check if data is already formatted (from new Apps Script)
+                if (data.length > 0 && data[0].unitNo !== undefined) {
+                    // Data is already formatted - use it directly
+                    console.log('Using pre-formatted data from Apps Script');
+                    return data;
+                }
+
+                // Old format - parse raw arrays
+                const hasHeader = data.length > 0 && String(data[0][0]).toLowerCase().includes('unit');
+                const rows = hasHeader ? data.slice(1) : data;
 
                 return rows.map((row, index) => {
                     if (!row || row.length === 0 || !row[COLUMN_MAP.UNIT_NO]) return null;
@@ -960,10 +970,16 @@
             if (syncBtn) syncBtn.classList.add('spinning');
 
             parsedDataList = await fetchFromSheets();
+            console.log('Parsed data list:', parsedDataList);
+            
             if (parsedDataList.length > 0) {
                 populateFilters();
                 updateTopHeaderInfo();
                 renderTable();
+                console.log('Dashboard rendered with ' + parsedDataList.length + ' items');
+            } else {
+                console.warn('No data available');
+                document.getElementById('table-body').innerHTML = '<tr><td colspan="7" class="empty-row">No data available. Make sure your sheet has data and Apps Script is deployed.</td></tr>';
             }
 
             setTimeout(() => {
