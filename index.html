@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Repair & Maintenance Dashboard</title>
+    <title>OAEC MAINTENANCE REPAIR</title>
     <style>
         :root {
             --bg-main: #f1f5f9;
@@ -841,7 +841,13 @@
             </div>
             <div class="modal-section">
                 <label>UPDATED BY</label>
-                <div class="modal-pic" id="modal-pic-name"></div>
+                <input 
+                    type="text" 
+                    id="modal-pic-input" 
+                    class="modal-input" 
+                    placeholder="Enter name of person who updated"
+                    autocomplete="off"
+                >
             </div>
             <div class="modal-section">
                 <label>DATE</label>
@@ -951,6 +957,7 @@
                     unitNo: item.unitNo,
                     week: item.week,
                     status: item.status,
+                    pic: item.pic,
                     remarks: item.remarks
                 };
 
@@ -1015,7 +1022,10 @@
         }
 
         function showUpdateModal(item) {
-            document.getElementById('modal-pic-name').textContent = item.pic || 'Not Assigned';
+            // Pre-fill with existing PIC name from column J, but allow editing
+            document.getElementById('modal-pic-input').value = item.pic || '';
+            document.getElementById('modal-pic-input').focus();
+            
             const today = new Date();
             const dateStr = today.toISOString().split('T')[0];
             document.getElementById('modal-date-input').value = dateStr;
@@ -1035,8 +1045,16 @@
             const item = parsedDataList.find(d => d.id === pendingUpdateId);
             if (!item) { closeUpdateModal(); return; }
 
+            // Get the manually entered name from the input field
+            const manualPicName = document.getElementById('modal-pic-input').value.trim();
+            const picName = manualPicName || item.pic || 'Unknown';
+            
+            // Update the item with the manually entered name (if different from column J)
+            if (manualPicName) {
+                item.pic = manualPicName;
+            }
+            
             item.status = pendingNewStatus;
-            const picName = item.pic || 'Unknown';
             item.remarks = `as per ${picName}`;
 
             const selectElem = document.getElementById(`status-select-${pendingUpdateId}`);
