@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OAEC MAINTENANCE PLAN</title>
+    <title>OAEC MAINTENANCE REPAIR</title>
     <style>
         :root {
             --bg-main: #f1f5f9;
@@ -76,70 +76,38 @@
             color: var(--accent-green);
         }
 
-        .navbar-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .auto-refresh-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 0.5rem 0.85rem;
-            border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        #auto-refresh-toggle {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: var(--accent-green);
-        }
-
-        .auto-refresh-label {
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #ffffff;
-            cursor: pointer;
-            white-space: nowrap;
-            user-select: none;
-        }
+        /* Sync Button Styling */
         .btn-sync {
-            background: var(--accent-green);
+            background: #1e293b;
             color: #ffffff;
-            border: none;
-            padding: 0.5rem 1rem;
+            border: 1px solid #475569;
+            padding: 0.4rem 0.85rem;
             border-radius: 4px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             transition: all 0.2s ease;
-            white-space: nowrap;
         }
 
         .btn-sync:hover {
-            background: #059669;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-            transform: translateY(-1px);
+            background: #334155;
+            border-color: #64748b;
         }
 
-        .btn-sync:active {
-            transform: translateY(0);
+        .btn-sync .sync-icon {
+            display: inline-block;
+            transition: transform 0.6s ease;
         }
 
         .btn-sync.spinning .sync-icon {
-            animation: spin 0.8s linear infinite;
+            animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Dashboard Top Section Layout */
@@ -693,25 +661,12 @@
         <!-- Navigation Bar -->
         <nav class="navbar">
             <div class="navbar-left">
+                <button class="btn-sync" id="top-sync-btn" onclick="syncData()">
+                    <span class="sync-icon">🔄</span> Sync
+                </button>
                 <div class="navbar-brand">
                     📊 <span>OAEC</span> Equipment Repair Dashboard
                 </div>
-            </div>
-            <div class="navbar-right">
-                <div class="auto-refresh-container">
-                    <input 
-                        type="checkbox" 
-                        id="auto-refresh-toggle" 
-                        onchange="toggleAutoRefresh(this.checked)"
-                        checked
-                    >
-                    <label for="auto-refresh-toggle" class="auto-refresh-label">
-                        Auto-Refresh
-                    </label>
-                </div>
-                <button class="btn-sync" id="top-sync-btn" onclick="syncData()">
-                    <span class="sync-icon">🔄</span> Sync Now
-                </button>
             </div>
         </nav>
 
@@ -1014,41 +969,6 @@
                 });
             } catch (error) {
                 console.error('Failed to update DB:', error);
-            }
-        }
-
-        // Auto-refresh variables
-        let autoRefreshInterval = null;
-        const AUTO_REFRESH_INTERVAL = 60 * 1000; // 60 seconds (1 minute) - for testing
-        // Change to: const AUTO_REFRESH_INTERVAL = 60 * 60 * 1000; // 1 hour for production
-
-        function toggleAutoRefresh(enabled) {
-            if (enabled) {
-                startAutoRefresh();
-            } else {
-                stopAutoRefresh();
-            }
-        }
-
-        function startAutoRefresh() {
-            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-            
-            console.log('Auto-refresh started - will sync every 60 seconds');
-            // Initial sync
-            syncData();
-            
-            // Set interval for subsequent syncs
-            autoRefreshInterval = setInterval(() => {
-                console.log('Auto-refresh: syncing data...');
-                syncData();
-            }, AUTO_REFRESH_INTERVAL);
-        }
-
-        function stopAutoRefresh() {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-                autoRefreshInterval = null;
-                console.log('Auto-refresh stopped');
             }
         }
 
@@ -1450,14 +1370,7 @@
         }
 
         async function init() {
-            // Check if auto-refresh is enabled (default is checked)
-            const autoRefreshCheckbox = document.getElementById('auto-refresh-toggle');
-            if (autoRefreshCheckbox && autoRefreshCheckbox.checked) {
-                startAutoRefresh();
-            } else {
-                await syncData();
-            }
-
+            await syncData();
             if (parsedDataList.length > 0) {
                 autoSelectCurrentWeek();
                 updateTopHeaderInfo();
