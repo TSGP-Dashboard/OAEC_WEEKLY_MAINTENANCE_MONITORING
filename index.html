@@ -1624,27 +1624,27 @@
                 document.getElementById('ai-chat-input').focus();
             }
         }
-
+ 
         function handleChatKeyPress(event) {
             if (event.key === 'Enter') {
                 sendChatMessage();
             }
         }
-
+ 
         function sendChatMessage() {
             const input = document.getElementById('ai-chat-input');
             const text = input.value.trim();
             if (!text) return;
-
+ 
             addBubble(text, 'user');
             input.value = '';
-
+ 
             setTimeout(() => {
                 const response = getAiResponse(text);
                 addBubble(response, 'bot');
             }, 600);
         }
-
+ 
         function addBubble(text, sender) {
             const chatBody = document.getElementById('ai-chat-body');
             const bubble = document.createElement('div');
@@ -1653,7 +1653,7 @@
             chatBody.appendChild(bubble);
             chatBody.scrollTop = chatBody.scrollHeight;
         }
-
+ 
         function getAiResponse(userText) {
             const query = userText.toLowerCase().trim();
             const total = parsedDataList.length;
@@ -1661,7 +1661,7 @@
             if (total === 0) {
                 return "📊 No repair data available yet. Please sync your data first!";
             }
-
+ 
             // ===== CALCULATE KEY METRICS =====
             const done = parsedDataList.filter(r => r.status.toLowerCase() === 'done').length;
             const pending = total - done;
@@ -1678,7 +1678,7 @@
                     done: parsedDataList.filter(r => r.location === loc && r.status.toLowerCase() === 'done').length
                 };
             });
-
+ 
             // ===== 1. SEARCH BY UNIT NUMBER =====
             const numberMatch = query.match(/(\w+-?\d+|\d+)/);
             if (numberMatch) {
@@ -1693,12 +1693,12 @@
                     }).join('\n\n---\n\n');
                 }
             }
-
+ 
             // ===== 2. STATUS & SUMMARY QUERIES =====
             if (query.includes('status') || query.includes('summary') || query.includes('overview') || query.includes('progress')) {
                 return `📊 **Repair Status Summary**\n\n✅ Completed: ${done}/${total} (${completionRate}%)\n⏳ Pending: ${pending}\n\n🔧 Breakdown:\n  • PM Tasks: ${pm}\n  • CM Tasks: ${cm}\n\n${completionRate >= 80 ? '🎉 Great progress!' : completionRate >= 50 ? '💪 Keep pushing!' : '⚡ Need to accelerate!'}`;
             }
-
+ 
             // ===== 3. PENDING/NOT DONE QUERIES =====
             if (query.includes('pending') || query.includes('not done') || query.includes('urgent') || query.includes('todo')) {
                 const pendingList = parsedDataList.filter(r => r.status.toLowerCase() !== 'done');
@@ -1708,7 +1708,7 @@
                 const topPending = pendingList.slice(0, 5).map(r => `• ${r.unitNo} - ${r.repairType} (${r.location})`).join('\n');
                 return `⏳ **${pending} Pending Repairs**\n\nTop pending items:\n${topPending}\n\n💡 Tip: Focus on these to increase completion rate!`;
             }
-
+ 
             // ===== 4. PM/CM RATIO & TYPE QUERIES =====
             if (query.includes('pm') || query.includes('cm') || query.includes('type') || query.includes('repair type')) {
                 const pmDone = parsedDataList.filter(r => r.repairType.toUpperCase().includes('PM') && r.status.toLowerCase() === 'done').length;
@@ -1718,7 +1718,7 @@
                 
                 return `🔧 **Repair Type Breakdown**\n\n📋 PM (Preventive Maintenance):\n  Total: ${pm} | Done: ${pmDone} | Pending: ${pmPending}\n\n🔨 CM (Corrective Maintenance):\n  Total: ${cm} | Done: ${cmDone} | Pending: ${cmPending}\n\nPM Completion: ${pm > 0 ? Math.round((pmDone/pm)*100) : 0}%\nCM Completion: ${cm > 0 ? Math.round((cmDone/cm)*100) : 0}%`;
             }
-
+ 
             // ===== 5. LOCATION QUERIES =====
             if (query.includes('location') || query.includes('by location') || query.includes('where')) {
                 const locationSummary = Object.entries(locationStats)
@@ -1726,7 +1726,7 @@
                     .join('\n');
                 return `📍 **Repairs by Location**\n\n${locationSummary}\n\n💡 Which location needs most attention?`;
             }
-
+ 
             // ===== 6. PERFORMANCE & INSIGHTS =====
             if (query.includes('performance') || query.includes('how') || query.includes('doing') || query.includes('progress')) {
                 let insight = '';
@@ -1741,14 +1741,14 @@
                 }
                 return `${insight}\n\nCurrent Rate: ${completionRate}%\nCompleted: ${done}/${total}\nRemaining: ${pending}`;
             }
-
+ 
             // ===== 7. DURATION/TIME QUERIES =====
             if (query.includes('duration') || query.includes('time') || query.includes('how long')) {
                 const durations = parsedDataList.map(r => r.duration).filter(Boolean);
                 const uniqueDurations = [...new Set(durations)];
                 return `⏱️ **Repair Durations**\n\nTask Durations Scheduled:\n${uniqueDurations.slice(0, 8).map(d => `• ${d}`).join('\n')}\n\n💡 Use this to plan your schedule better!`;
             }
-
+ 
             // ===== 8. LOCATION PERFORMANCE =====
             if (query.includes('best location') || query.includes('most productive')) {
                 const best = Object.entries(locationStats).reduce((a, b) => 
@@ -1756,15 +1756,16 @@
                 );
                 return `🏆 **Best Performing Location**\n\n📍 ${best[0]}\nCompletion Rate: ${best[1].total > 0 ? Math.round((best[1].done / best[1].total) * 100) : 0}%\nDone: ${best[1].done}/${best[1].total}`;
             }
-
+ 
             // ===== 9. HELP & EXAMPLES =====
             if (query.includes('help') || query.includes('what') || query.includes('how can') || query === '') {
                 return `🤖 **I can help you with:**\n\n📊 Ask about overall status\n🔍 Search a unit (e.g., "SV-391")\n📋 Repair types (PM/CM breakdown)\n📍 Location performance\n⏳ Pending repairs\n🎯 Performance insights\n⏱️ Repair durations\n\nWhat would you like to know?`;
             }
-
+ 
             // ===== 10. DEFAULT SMART RESPONSE =====
             return `I understand you're asking about: "${userText}"\n\nHere's what I know:\n• Total repairs: ${total}\n• Completed: ${done} (${completionRate}%)\n• Pending: ${pending}\n\nTry asking about status, pending items, locations, or search a specific unit!`;
         }
+ 
 
         async function init() {
             await syncData();
