@@ -19,6 +19,7 @@
             /* Vibrant Accents */
             --accent-cyan: #00d3d5;        /* Primary bright cyan/teal highlight */
             --accent-blue: #2a8bf2;        /* Secondary blue accent */
+            --accent-orange: #ff7a00;      /* Accent orange */
             --accent-purple: #9254de;      /* Accent purple */
             --accent-pink: #f759ab;        /* Accent pink */
             --accent-green: #20c997;       /* Status Green */
@@ -231,11 +232,12 @@
             padding: 0.4rem 0.8rem;
             font-size: 0.85rem;
             font-weight: 700;
-            color: var(--accent-black);
+            color: var(--accent-cyan);
             cursor: pointer;
             outline: none;
         }
 
+        /* Full Circular Gauge Styling */
         .gauges-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -246,7 +248,7 @@
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
             border-radius: 10px;
-            padding: 1rem;
+            padding: 1.25rem 1rem;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -272,37 +274,62 @@
             font-weight: 700;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             letter-spacing: 0.5px;
+            text-align: center;
         }
 
         .svg-gauge-container {
-            width: 170px;
-            height: 90px;
+            width: 130px;
+            height: 130px;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-ring-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.06);
+            stroke-width: 10;
+        }
+
+        .gauge-ring-progress {
+            fill: none;
+            stroke-width: 10;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dasharray 0.8s ease-out;
+        }
+
+        .gauge-center-circle {
+            transition: fill 0.3s ease;
         }
 
         .gauge-center-text {
             position: absolute;
-            bottom: 2px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%);
             text-align: center;
-            white-space: nowrap;
+            width: 100px;
+            pointer-events: none;
         }
 
         .gauge-value {
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             font-weight: 800;
             color: var(--text-primary);
-            line-height: 1;
+            line-height: 1.1;
         }
 
         .gauge-subtext {
-            font-size: 0.68rem;
+            font-size: 0.65rem;
             color: var(--text-muted);
-            margin-top: 3px;
+            margin-top: 4px;
             font-weight: 600;
+            text-transform: uppercase;
         }
 
         .table-panel {
@@ -741,17 +768,14 @@
             </div>
 
             <div class="gauges-grid">
+                <!-- Total Equipment Card -->
                 <div class="gauge-card" id="gauge-card-total" onclick="filterByGauge('ALL')">
                     <div class="gauge-title">Total Equipment Repairs</div>
                     <div class="svg-gauge-container">
-                        <svg viewBox="0 0 200 110" width="100%" height="100%">
-                           <path d="M 20,100 A 80,80 0 0,1 73,30" fill="none" stroke="#6495ed" stroke-width="22" stroke-linecap="square"/>
-                            <path d="M 78,27 A 80,80 0 0,1 122,27" fill="none" stroke="#6495ed" stroke-width="22" stroke-linecap="square"/>
-                            <path d="M 127,30 A 80,80 0 0,1 180,100" fill="none" stroke="#6495ed" stroke-width="22" stroke-linecap="square"/>
-                            <g id="needle-total" transform="rotate(0, 100, 100)" style="transition: transform 0.6s ease-out;">
-                                <line x1="100" y1="100" x2="100" y2="30" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square"/>
-                                <circle cx="100" cy="100" r="5" fill="#FFFFFF"/>
-                            </g>
+                        <svg viewBox="0 0 100 100" width="100%" height="100%">
+                            <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#2a8bf2" />
+                            <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
+                            <circle cx="50" cy="50" r="42" id="ring-total" class="gauge-ring-progress" stroke="#2a8bf2" />
                         </svg>
                         <div class="gauge-center-text">
                             <div class="gauge-value" id="stat-total">0</div>
@@ -760,16 +784,14 @@
                     </div>
                 </div>
 
+                <!-- Completed (Done) Card -->
                 <div class="gauge-card" id="gauge-card-done" onclick="filterByGauge('DONE')">
                     <div class="gauge-title">Completed (Done)</div>
                     <div class="svg-gauge-container">
-                        <svg viewBox="0 0 200 110" width="100%" height="100%">
-                            <path d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="22" stroke-linecap="square"/>
-                            <path d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="#20c997" stroke-width="22" stroke-linecap="square"/>
-                            <g id="needle-done" transform="rotate(-90, 100, 100)" style="transition: transform 0.6s ease-out;">
-                                <line x1="100" y1="100" x2="100" y2="30" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square"/>
-                                <circle cx="100" cy="100" r="5" fill="#FFFFFF"/>
-                            </g>
+                        <svg viewBox="0 0 100 100" width="100%" height="100%">
+                            <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#20c997" />
+                            <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
+                            <circle cx="50" cy="50" r="42" id="ring-done" class="gauge-ring-progress" stroke="#20c997" />
                         </svg>
                         <div class="gauge-center-text">
                             <div class="gauge-value" id="stat-done">0</div>
@@ -778,16 +800,14 @@
                     </div>
                 </div>
 
+                <!-- Pending Equipment Card -->
                 <div class="gauge-card" id="gauge-card-notdone" onclick="filterByGauge('NOT DONE')">
                     <div class="gauge-title">Pending Equipment</div>
                     <div class="svg-gauge-container">
-                        <svg viewBox="0 0 200 110" width="100%" height="100%">
-                            <path d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="22" stroke-linecap="square"/>
-                            <path d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="#ff4d4f" stroke-width="22" stroke-linecap="square"/>
-                            <g id="needle-notdone" transform="rotate(-90, 100, 100)" style="transition: transform 0.6s ease-out;">
-                                <line x1="100" y1="100" x2="100" y2="30" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square"/>
-                                <circle cx="100" cy="100" r="5" fill="#FFFFFF"/>
-                            </g>
+                        <svg viewBox="0 0 100 100" width="100%" height="100%">
+                            <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#ff4d4f" />
+                            <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
+                            <circle cx="50" cy="50" r="42" id="ring-notdone" class="gauge-ring-progress" stroke="#ff4d4f" />
                         </svg>
                         <div class="gauge-center-text">
                             <div class="gauge-value" id="stat-notdone">0</div>
@@ -796,16 +816,14 @@
                     </div>
                 </div>
 
+                <!-- PM vs CM Distribution Card -->
                 <div class="gauge-card" id="gauge-card-pmcm" onclick="togglePmCmGauge()">
                     <div class="gauge-title">PM vs CM Distribution</div>
                     <div class="svg-gauge-container">
-                        <svg viewBox="0 0 200 110" width="100%" height="100%">
-                             <path d="M 20,100 A 80,80 0 0,1 100,20" fill="none" stroke="#a7dfea" stroke-width="22" stroke-linecap="square"/>
-                            <path d="M 100,20 A 80,80 0 0,1 180,100" fill="none" stroke="#89d6e8" stroke-width="22" stroke-linecap="square"/>
-                            <g id="needle-pmcm" transform="rotate(0, 100, 100)" style="transition: transform 0.6s ease-out;">
-                                <line x1="100" y1="100" x2="100" y2="30" stroke="#FFFFFF" stroke-width="3" stroke-linecap="square"/>
-                                <circle cx="100" cy="100" r="5" fill="#FFFFFF"/>
-                            </g>
+                        <svg viewBox="0 0 100 100" width="100%" height="100%">
+                            <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#00d3d5" />
+                            <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
+                            <circle cx="50" cy="50" r="42" id="ring-pmcm" class="gauge-ring-progress" stroke="#00d3d5" />
                         </svg>
                         <div class="gauge-center-text">
                             <div class="gauge-value" id="stat-pmcm-counts">0 / 0</div>
@@ -1363,25 +1381,31 @@
             const notDonePct = total > 0 ? Math.round((notDone / total) * 100) : 0;
 
             document.getElementById('stat-total').textContent = total;
-            document.getElementById('stat-done').textContent = done;
-            document.getElementById('stat-done-pct').textContent = `${donePct}% Rate`;
+            document.getElementById('stat-done').textContent = `${donePct}%`;
+            document.getElementById('stat-done-pct').textContent = `${done} Done`;
 
-            document.getElementById('stat-notdone').textContent = notDone;
-            document.getElementById('stat-notdone-pct').textContent = `${notDonePct}% Pending`;
+            document.getElementById('stat-notdone').textContent = `${notDonePct}%`;
+            document.getElementById('stat-notdone-pct').textContent = `${notDone} Pending`;
 
-            document.getElementById('stat-pmcm-counts').textContent = `${pmCount} PM / ${cmCount} CM`;
-            const pmPct = (pmCount + cmCount) > 0 ? Math.round((pmCount / (pmCount + cmCount)) * 100) : 50;
-            document.getElementById('stat-pmcm-ratio').textContent = `${pmPct}% PM Ratio`;
+            const pmPct = (pmCount + cmCount) > 0 ? Math.round((pmCount / (pmCount + cmCount)) * 100) : 0;
+            document.getElementById('stat-pmcm-counts').textContent = `${pmPct}%`;
+            document.getElementById('stat-pmcm-ratio').textContent = `${pmCount} PM / ${cmCount} CM`;
 
-            setNeedleAngle('needle-total', 0);
-            setNeedleAngle('needle-done', (donePct * 1.8) - 90);
-            setNeedleAngle('needle-notdone', (notDonePct * 1.8) - 90);
-            setNeedleAngle('needle-pmcm', (pmPct * 1.8) - 90);
+            // Circumference of dynamic circle (2 * π * r = 2 * 3.14159 * 42 ≈ 263.89)
+            const circumference = 263.89;
+
+            setRingProgress('ring-total', 100, circumference);
+            setRingProgress('ring-done', donePct, circumference);
+            setRingProgress('ring-notdone', notDonePct, circumference);
+            setRingProgress('ring-pmcm', pmPct, circumference);
         }
 
-        function setNeedleAngle(elementId, degrees) {
+        function setRingProgress(elementId, percentage, circumference) {
             const el = document.getElementById(elementId);
-            if (el) el.setAttribute('transform', `rotate(${degrees}, 100, 100)`);
+            if (!el) return;
+            const clampedPct = Math.min(100, Math.max(0, percentage));
+            const dashVal = (clampedPct / 100) * circumference;
+            el.setAttribute('stroke-dasharray', `${dashVal} ${circumference}`);
         }
 
         function highlightActiveGaugeCard() {
