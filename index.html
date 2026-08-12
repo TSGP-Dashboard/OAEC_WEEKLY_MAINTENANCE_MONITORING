@@ -573,6 +573,7 @@
             font-style: italic;
         }
 
+        /* Modal Styling */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -707,6 +708,159 @@
         .status-dropdown:disabled {
             cursor: not-allowed;
             opacity: 0.8;
+        }
+
+        /* AI Assistant Floating Widget */
+        .ai-chat-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            color: #121621;
+            border: none;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 211, 213, 0.4);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .ai-chat-toggle:hover {
+            transform: scale(1.08);
+            background: #00e5e8;
+        }
+
+        .ai-chat-widget {
+            position: fixed;
+            bottom: 92px;
+            right: 24px;
+            width: 360px;
+            height: 480px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.25s ease-in-out;
+        }
+
+        .ai-chat-widget.open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .ai-chat-header {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .ai-chat-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .ai-chat-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .ai-chat-close:hover {
+            color: var(--text-primary);
+        }
+
+        .ai-chat-body {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 0.6rem 0.85rem;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .chat-bubble.bot {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border: 1px solid var(--panel-border);
+            border-top-left-radius: 2px;
+        }
+
+        .chat-bubble.user {
+            background: var(--accent-cyan);
+            color: #121621;
+            font-weight: 600;
+            align-self: flex-end;
+            border-top-right-radius: 2px;
+        }
+
+        .ai-chat-footer {
+            padding: 0.75rem;
+            border-top: 1px solid var(--panel-border);
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        .ai-chat-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            color: var(--text-primary);
+            font-size: 0.82rem;
+            outline: none;
+        }
+
+        .ai-chat-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .ai-chat-send {
+            background: var(--accent-cyan);
+            color: #121621;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .ai-chat-send:hover {
+            background: #00e5e8;
         }
     </style>
 </head>
@@ -915,6 +1069,32 @@
     </div>
     <div id="modal-overlay" class="modal-overlay" style="display: none;" onclick="closeUpdateModal()"></div>
 
+    <!-- AI Chat Assistant Widget -->
+    <button class="ai-chat-toggle" id="ai-chat-toggle" onclick="toggleAiChat()">🤖</button>
+    <div class="ai-chat-widget" id="ai-chat-widget">
+        <div class="ai-chat-header">
+            <div class="ai-chat-title">
+                <span>🤖</span> AI Assistant
+            </div>
+            <button class="ai-chat-close" onclick="toggleAiChat()">✕</button>
+        </div>
+        <div class="ai-chat-body" id="ai-chat-body">
+            <div class="chat-bubble bot">
+                Hello! I am your OAEC Maintenance Assistant. Ask me anything about equipment repairs, pending tasks, or PM/CM ratios.
+            </div>
+        </div>
+        <div class="ai-chat-footer">
+            <input 
+                type="text" 
+                id="ai-chat-input" 
+                class="ai-chat-input" 
+                placeholder="Type a message..." 
+                onkeypress="handleChatKeyPress(event)"
+            />
+            <button class="ai-chat-send" onclick="sendChatMessage()">Send</button>
+        </div>
+    </div>
+
     <script>
         const DB_CONFIG = {
             API_URL: 'https://script.google.com/macros/s/AKfycbxhFSMO4tPU2UnhYoVuajhpKZWHFrDeKCbMi0kFP7NGEkZAAbqBEP2K0jSPPpNYNOejSA/exec'
@@ -960,10 +1140,8 @@
                 if (!response.ok) throw new Error(`API Response Error: ${response.status}`);
 
                 const data = await response.json();
-                console.log('Raw data from API:', data);
 
                 if (data.length > 0 && data[0].unitNo !== undefined) {
-                    console.log('Using pre-formatted data from Apps Script');
                     return data;
                 }
 
@@ -1028,33 +1206,19 @@
 
         function toggleAutoRefresh(enabled) {
             if (enabled) {
-                console.log('Auto-refresh enabled - will sync every 60 seconds');
                 if (autoRefreshInterval) clearInterval(autoRefreshInterval);
                 autoRefreshInterval = setInterval(() => {
-                    console.log('Auto-refresh: syncing data...');
                     syncData();
                 }, AUTO_REFRESH_INTERVAL);
             } else {
-                console.log('Auto-refresh disabled');
                 stopAutoRefresh();
             }
-        }
-
-        function startAutoRefresh() {
-            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-            console.log('Auto-refresh started - will sync every 60 seconds');
-            syncData();
-            autoRefreshInterval = setInterval(() => {
-                console.log('Auto-refresh: syncing data...');
-                syncData();
-            }, AUTO_REFRESH_INTERVAL);
         }
 
         function stopAutoRefresh() {
             if (autoRefreshInterval) {
                 clearInterval(autoRefreshInterval);
                 autoRefreshInterval = null;
-                console.log('Auto-refresh stopped');
             }
         }
 
@@ -1063,15 +1227,12 @@
             if (syncBtn) syncBtn.classList.add('spinning');
 
             parsedDataList = await fetchFromSheets();
-            console.log('Parsed data list:', parsedDataList);
             
             if (parsedDataList.length > 0) {
                 populateFilters();
                 updateTopHeaderInfo();
                 renderTable();
-                console.log('Dashboard rendered with ' + parsedDataList.length + ' items');
             } else {
-                console.warn('No data available');
                 document.getElementById('table-body').innerHTML = '<tr><td colspan="7" class="empty-row">No data available. Make sure your sheet has data and Apps Script is deployed.</td></tr>';
             }
 
@@ -1391,7 +1552,6 @@
             document.getElementById('stat-pmcm-counts').textContent = `${pmPct}%`;
             document.getElementById('stat-pmcm-ratio').textContent = `${pmCount} PM / ${cmCount} CM`;
 
-            // Circumference of dynamic circle (2 * π * r = 2 * 3.14159 * 42 ≈ 263.89)
             const circumference = 263.89;
 
             setRingProgress('ring-total', 100, circumference);
@@ -1456,13 +1616,82 @@
             a.click();
         }
 
+        /* AI Chatbot Functions */
+        function toggleAiChat() {
+            const widget = document.getElementById('ai-chat-widget');
+            widget.classList.toggle('open');
+            if (widget.classList.contains('open')) {
+                document.getElementById('ai-chat-input').focus();
+            }
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('ai-chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            addBubble(text, 'user');
+            input.value = '';
+
+            setTimeout(() => {
+                const response = getAiResponse(text);
+                addBubble(response, 'bot');
+            }, 600);
+        }
+
+        function addBubble(text, sender) {
+            const chatBody = document.getElementById('ai-chat-body');
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${sender}`;
+            bubble.textContent = text;
+            chatBody.appendChild(bubble);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function getAiResponse(userText) {
+    const query = userText.toLowerCase().trim();
+    const total = parsedDataList.length;
+
+    // 1. Search for specific Unit Number (e.g., "Unit 102", "U-12", or just a number matching unitNo)
+    const matchedItems = parsedDataList.filter(item => 
+        query.includes(String(item.unitNo).toLowerCase())
+    );
+
+    if (matchedItems.length > 0) {
+        return matchedItems.map(item => 
+            `Unit ${item.unitNo}: Status is [${item.status}], Type: ${item.repairType}, Location: ${item.location || 'N/A'}. Desc: "${item.repairDesc}"`
+        ).join('\n\n');
+    }
+
+    // 2. Fallback Summary Logic
+    const done = parsedDataList.filter(r => r.status.toLowerCase() === 'done').length;
+    const pending = total - done;
+
+    if (query.includes('status') || query.includes('summary')) {
+        return `Currently, there are ${total} total repairs scheduled. ${done} completed, ${pending} pending.`;
+    } else if (query.includes('pending') || query.includes('not done')) {
+        return `There are ${pending} pending repairs waiting to be completed.`;
+    } else if (query.includes('pm') || query.includes('cm')) {
+        const pm = parsedDataList.filter(r => r.repairType.toUpperCase().includes('PM')).length;
+        const cm = parsedDataList.filter(r => r.repairType.toUpperCase().includes('CM')).length;
+        return `We currently have ${pm} PM tasks and ${cm} CM tasks.`;
+    } else {
+        return "You can search by typing a specific Unit Number (e.g., 'Unit 12'), or ask about overall repair status and PM/CM ratios!";
+    }
+}
+
         async function init() {
             await syncData();
             
             const autoRefreshCheckbox = document.getElementById('auto-refresh-toggle');
             if (autoRefreshCheckbox && autoRefreshCheckbox.checked) {
                 autoRefreshInterval = setInterval(() => {
-                    console.log('Auto-refresh: syncing data...');
                     syncData();
                 }, AUTO_REFRESH_INTERVAL);
             }
