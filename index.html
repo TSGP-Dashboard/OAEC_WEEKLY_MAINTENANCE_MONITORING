@@ -6,11 +6,12 @@
     <title>OAEC MAINTENANCE DASHBOARD</title>
     <style>
         :root {
-            /* Color Palette sampled from reference theme */
+            /* Color Palette */
             --bg-main: #1d222e;            /* Deep dark slate background */
             --panel-bg: #272c3a;          /* Rounded card panel background */
             --panel-border: rgba(255, 255, 255, 0.05); /* Subtle dark border */
             --header-bg: #1d222e;         /* Main top navbar background */
+            --sidebar-bg: #161a23;        /* Slightly darker tone for sidebar */
             
             /* Text Colors */
             --text-primary: #ffffff;       /* Pure white titles and values */
@@ -27,7 +28,7 @@
             
             /* Interactive States & Shadows */
             --active-ring: rgba(0, 211, 213, 0.3);
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
         }
 
         * {
@@ -44,9 +45,96 @@
             color: var(--text-primary);
         }
 
-        body {
+        /* 15% / 85% Split Layout */
+        .app-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* LEFT SIDEBAR (15%) */
+        .sidebar {
+            width: 15%;
+            min-width: 200px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--panel-border);
             display: flex;
             flex-direction: column;
+            padding: 1rem 0.75rem;
+            gap: 1.5rem;
+            z-index: 101;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .sidebar-brand span {
+            color: var(--accent-cyan);
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            list-style: none;
+        }
+
+        .menu-category-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.8px;
+            padding: 0 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .menu-item.active {
+            background: rgba(0, 211, 213, 0.12);
+            color: var(--accent-cyan);
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        .menu-item .icon {
+            font-size: 1rem;
+        }
+
+        /* RIGHT MAIN CONTENT (85%) */
+        .main-wrapper {
+            width: 85%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .fixed-top-header {
@@ -58,57 +146,43 @@
         .navbar {
             background: var(--header-bg);
             color: #ffffff;
-            padding: 1rem 1.75rem;
+            padding: 0.75rem 1.25rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--panel-border);
         }
 
-        .navbar-left {
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-        }
-
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 1.2rem;
+        .navbar-title {
+            font-size: 1.1rem;
             font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .navbar-brand span {
-            color: var(--accent-cyan);
         }
 
         .navbar-right {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .auto-refresh-container {
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.5rem;
             background: rgba(255, 255, 255, 0.03);
-            padding: 0.5rem 0.9rem;
-            border-radius: 8px;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
             border: 1px solid var(--panel-border);
         }
 
         #auto-refresh-toggle {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             cursor: pointer;
             accent-color: var(--accent-cyan);
         }
 
         .auto-refresh-label {
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             font-weight: 500;
             color: var(--text-muted);
             cursor: pointer;
@@ -120,14 +194,14 @@
             background: var(--accent-cyan);
             color: #121621;
             border: none;
-            padding: 0.55rem 1.25rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
+            padding: 0.45rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
             font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(0, 211, 213, 0.2);
         }
@@ -147,46 +221,43 @@
             to { transform: rotate(360deg); }
         }
 
+        /* COMPACT DASHBOARD TOP SECTION */
         .top-dashboard-section {
-            max-width: 1600px;
             width: 100%;
-            margin: 0 auto;
-            padding: 1.25rem 1.5rem 0.5rem 1.5rem;
+            padding: 0.75rem 1.25rem 0.25rem 1.25rem;
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
+            gap: 0.75rem;
         }
 
         .scrollable-content {
             flex: 1;
             overflow-y: auto;
-            padding: 0.75rem 1.5rem 1.5rem 1.5rem;
-            max-width: 1600px;
+            padding: 0.5rem 1.25rem 1.25rem 1.25rem;
             width: 100%;
-            margin: 0 auto;
         }
 
         .info-banner {
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
-            border-radius: 10px;
-            padding: 0.85rem 1.5rem;
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.75rem;
             box-shadow: var(--card-shadow);
         }
 
         .info-group {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
 
         .info-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
             color: var(--text-muted);
@@ -194,7 +265,7 @@
         }
 
         .info-val {
-            font-size: 0.95rem;
+            font-size: 0.88rem;
             font-weight: 700;
             color: var(--accent-cyan);
         }
@@ -202,7 +273,7 @@
         .repair-type-group {
             display: flex;
             background: rgba(0, 0, 0, 0.25);
-            padding: 3px;
+            padding: 2px;
             border-radius: 6px;
             border: 1px solid var(--panel-border);
             gap: 2px;
@@ -211,8 +282,8 @@
         .type-btn {
             border: none;
             background: transparent;
-            padding: 0.35rem 0.9rem;
-            font-size: 0.75rem;
+            padding: 0.25rem 0.7rem;
+            font-size: 0.7rem;
             font-weight: 700;
             color: var(--text-muted);
             border-radius: 4px;
@@ -229,26 +300,31 @@
             background: rgba(0, 0, 0, 0.25);
             border: 1px solid var(--panel-border);
             border-radius: 6px;
-            padding: 0.4rem 0.8rem;
-            font-size: 0.85rem;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
             font-weight: 700;
-            color: var(--accent-black);
+            color: var(--text-primary);
             cursor: pointer;
             outline: none;
         }
 
-        /* Full Circular Gauge Styling */
+        .week-select-top option {
+            background: var(--panel-bg);
+            color: var(--text-primary);
+        }
+
+        /* COMPACT GAUGES */
         .gauges-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.25rem;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
         }
 
         .gauge-card {
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
-            border-radius: 10px;
-            padding: 1.25rem 1rem;
+            border-radius: 8px;
+            padding: 0.75rem 0.5rem;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -266,22 +342,22 @@
 
         .gauge-card.active-filter {
             border: 1px solid var(--accent-cyan);
-            box-shadow: 0 0 16px var(--active-ring);
+            box-shadow: 0 0 12px var(--active-ring);
         }
 
         .gauge-title {
-            font-size: 0.75rem;
+            font-size: 0.68rem;
             font-weight: 700;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.4rem;
             letter-spacing: 0.5px;
             text-align: center;
         }
 
         .svg-gauge-container {
-            width: 130px;
-            height: 130px;
+            width: 95px;
+            height: 95px;
             position: relative;
             display: flex;
             align-items: center;
@@ -313,68 +389,69 @@
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
-            width: 100px;
+            width: 80px;
             pointer-events: none;
         }
 
         .gauge-value {
-            font-size: 1.25rem;
+            font-size: 1.05rem;
             font-weight: 800;
             color: var(--text-primary);
             line-height: 1.1;
         }
 
         .gauge-subtext {
-            font-size: 0.65rem;
+            font-size: 0.58rem;
             color: var(--text-muted);
-            margin-top: 4px;
+            margin-top: 2px;
             font-weight: 600;
             text-transform: uppercase;
         }
 
+        /* COMPACT TABLE PANEL */
         .table-panel {
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
-            border-radius: 10px;
+            border-radius: 8px;
             box-shadow: var(--card-shadow);
             overflow: hidden;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .table-header-bar {
             background: rgba(0, 0, 0, 0.15);
             border-bottom: 1px solid var(--panel-border);
-            padding: 1rem 1.5rem;
+            padding: 0.65rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.5rem;
         }
 
         .table-title {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: 700;
             color: var(--text-primary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
 
         .table-controls {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
             flex-wrap: wrap;
         }
 
         .control-select {
-            padding: 0.45rem 0.85rem;
+            padding: 0.35rem 0.65rem;
             border: 1px solid var(--panel-border);
             border-radius: 6px;
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             color: var(--text-primary);
             background: rgba(0, 0, 0, 0.25);
             outline: none;
@@ -386,9 +463,9 @@
         }
 
         .btn {
-            padding: 0.45rem 1rem;
+            padding: 0.35rem 0.75rem;
             border-radius: 6px;
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             font-weight: 600;
             cursor: pointer;
             border: 1px solid transparent;
@@ -422,7 +499,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.83rem;
+            font-size: 0.78rem;
             text-align: left;
             table-layout: fixed;
         }
@@ -436,17 +513,17 @@
         }
 
         th {
-            padding: 0.85rem 0.85rem;
+            padding: 0.55rem 0.65rem;
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             letter-spacing: 0.5px;
             white-space: nowrap;
         }
 
         td {
-            padding: 0.75rem 0.85rem;
+            padding: 0.45rem 0.65rem;
             border-bottom: 1px solid var(--panel-border);
             color: var(--text-primary);
             vertical-align: middle;
@@ -481,9 +558,9 @@
 
         .type-tag {
             display: inline-block;
-            padding: 0.2rem 0.5rem;
+            padding: 0.15rem 0.4rem;
             border-radius: 4px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 700;
         }
 
@@ -502,13 +579,13 @@
         .desc-cell {
             font-weight: 500;
             color: #d0d7de;
-            line-height: 1.35;
+            line-height: 1.25;
         }
 
         .status-dropdown {
-            padding: 0.35rem 0.45rem;
-            border-radius: 6px;
-            font-size: 0.72rem;
+            padding: 0.25rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.68rem;
             font-weight: 700;
             border: 1px solid transparent;
             cursor: pointer;
@@ -530,10 +607,10 @@
 
         .remarks-input-box {
             width: 100%;
-            padding: 0.35rem 0.5rem;
+            padding: 0.25rem 0.4rem;
             border: 1px solid var(--panel-border);
-            border-radius: 6px;
-            font-size: 0.78rem;
+            border-radius: 4px;
+            font-size: 0.72rem;
             outline: none;
             background: rgba(0, 0, 0, 0.2);
             color: var(--text-primary);
@@ -545,30 +622,30 @@
         }
 
         .table-footer {
-            padding: 0.85rem 1.5rem;
+            padding: 0.6rem 1rem;
             background: rgba(0, 0, 0, 0.15);
             border-top: 1px solid var(--panel-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.5rem;
         }
 
         .pagination-info {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             font-weight: 500;
         }
 
         .pagination-actions {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
 
         .empty-row {
             text-align: center;
-            padding: 2.5rem;
+            padding: 2rem;
             color: var(--text-muted);
             font-style: italic;
         }
@@ -594,7 +671,7 @@
             border: 1px solid var(--panel-border);
             border-radius: 10px;
             width: 95%;
-            max-width: 400px;
+            max-width: 380px;
             z-index: 1000;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
@@ -602,53 +679,53 @@
         .modal-header {
             background: rgba(0, 0, 0, 0.2);
             color: var(--text-primary);
-            padding: 1.25rem;
+            padding: 1rem;
             font-weight: 700;
             text-align: center;
-            font-size: 1rem;
+            font-size: 0.95rem;
             letter-spacing: 1px;
             border-bottom: 1px solid var(--panel-border);
         }
 
         .modal-body {
-            padding: 1.5rem;
+            padding: 1.25rem;
         }
 
         .modal-section {
-            margin-bottom: 1.25rem;
+            margin-bottom: 1rem;
         }
 
         .modal-section label {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             font-weight: 700;
             color: var(--text-muted);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .modal-check {
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: var(--accent-green);
             text-align: center;
             font-weight: 700;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
         }
 
         .modal-status {
             text-align: center;
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--accent-green);
         }
 
         .modal-input {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.6rem;
             border: 1px solid var(--panel-border);
             border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-family: inherit;
             background: rgba(0, 0, 0, 0.25);
             color: var(--text-primary);
@@ -661,14 +738,14 @@
 
         .modal-footer {
             display: flex;
-            gap: 0.75rem;
-            padding: 1rem 1.5rem;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
             border-top: 1px solid var(--panel-border);
             justify-content: flex-end;
         }
 
         .modal-btn-cancel {
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 1rem;
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-primary);
             border: 1px solid var(--panel-border);
@@ -683,7 +760,7 @@
         }
 
         .modal-btn-save {
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 1rem;
             background: var(--accent-cyan);
             color: #121621;
             border: none;
@@ -713,15 +790,15 @@
         /* AI Assistant Floating Widget */
         .ai-chat-toggle {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 56px;
-            height: 56px;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             background: var(--accent-cyan);
             color: #121621;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -738,10 +815,10 @@
 
         .ai-chat-widget {
             position: fixed;
-            bottom: 92px;
-            right: 24px;
-            width: 360px;
-            height: 480px;
+            bottom: 78px;
+            right: 20px;
+            width: 340px;
+            height: 440px;
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
             border-radius: 12px;
@@ -764,7 +841,7 @@
 
         .ai-chat-header {
             background: rgba(0, 0, 0, 0.25);
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -774,8 +851,8 @@
         .ai-chat-title {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
+            gap: 0.4rem;
+            font-size: 0.85rem;
             font-weight: 700;
             color: var(--text-primary);
         }
@@ -784,7 +861,7 @@
             background: transparent;
             border: none;
             color: var(--text-muted);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
         }
 
@@ -794,7 +871,7 @@
 
         .ai-chat-header-buttons {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.4rem;
             align-items: center;
         }
 
@@ -802,10 +879,10 @@
             background: transparent;
             border: none;
             color: var(--text-muted);
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.2s ease;
-            padding: 0.25rem 0.5rem;
+            padding: 0.2rem 0.4rem;
             border-radius: 4px;
         }
 
@@ -816,19 +893,19 @@
 
         .ai-chat-body {
             flex: 1;
-            padding: 1rem;
+            padding: 0.85rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.6rem;
         }
 
         .chat-bubble {
-            max-width: 80%;
-            padding: 0.6rem 0.85rem;
-            border-radius: 10px;
-            font-size: 0.82rem;
-            line-height: 1.4;
+            max-width: 82%;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            line-height: 1.35;
             word-wrap: break-word;
         }
 
@@ -849,10 +926,10 @@
         }
 
         .ai-chat-footer {
-            padding: 0.75rem;
+            padding: 0.6rem;
             border-top: 1px solid var(--panel-border);
             display: flex;
-            gap: 0.5rem;
+            gap: 0.4rem;
             background: rgba(0, 0, 0, 0.15);
         }
 
@@ -861,9 +938,9 @@
             background: rgba(0, 0, 0, 0.25);
             border: 1px solid var(--panel-border);
             border-radius: 6px;
-            padding: 0.5rem 0.75rem;
+            padding: 0.45rem 0.65rem;
             color: var(--text-primary);
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             outline: none;
         }
 
@@ -876,190 +953,244 @@
             color: #121621;
             border: none;
             border-radius: 6px;
-            padding: 0.5rem 0.85rem;
+            padding: 0.45rem 0.75rem;
             font-weight: 700;
+            font-size: 0.78rem;
             cursor: pointer;
         }
 
         .ai-chat-send:hover {
             background: #00e5e8;
         }
+
+        /* View switching */
+        .tab-view {
+            display: none;
+        }
+
+        .tab-view.active-view {
+            display: block;
+        }
     </style>
 </head>
 <body>
 
-    <!-- FIXED TOP SECTION -->
-    <header class="fixed-top-header">
-        <nav class="navbar">
-            <div class="navbar-left">
-                <div class="navbar-brand">
-                    📊 <span>OAEC</span> Equipment Repair Dashboard
-                </div>
-            </div>
-            <div class="navbar-right">
-                <div class="auto-refresh-container">
-                    <input 
-                        type="checkbox" 
-                        id="auto-refresh-toggle" 
-                        onchange="toggleAutoRefresh(this.checked)"
-                        checked
-                    >
-                    <label for="auto-refresh-toggle" class="auto-refresh-label">
-                        Auto-Refresh (60s)
-                    </label>
-                </div>
-                <button class="btn-sync" id="top-sync-btn" onclick="syncData()">
-                    <span class="sync-icon">🔄</span> Sync Now
-                </button>
-            </div>
-        </nav>
-
-        <div class="top-dashboard-section">
-            <div class="info-banner">
-                <div class="info-group">
-                    <span class="info-label">Date Today:</span>
-                    <span class="info-val" id="header-date-today">--</span>
-                </div>
-
-                <div class="info-group">
-                    <span class="info-label">Repair Type:</span>
-                    <div class="repair-type-group">
-                        <button class="type-btn active" id="btn-type-all" onclick="setRepairTypeFilter('')">ALL</button>
-                        <button class="type-btn" id="btn-type-pm" onclick="setRepairTypeFilter('PM')">PM</button>
-                        <button class="type-btn" id="btn-type-cm" onclick="setRepairTypeFilter('CM')">CM</button>
-                    </div>
-                </div>
-
-                <div class="info-group">
-                    <span class="info-label">Select Week:</span>
-                    <select class="week-select-top" id="week-select">
-                        <option value="">All Weeks</option>
-                    </select>
-                </div>
-                
-                <div class="info-group">
-                    <span class="info-label">Week Duration:</span>
-                    <span class="info-val" id="header-week-range">--</span>
-                </div>
+    <div class="app-container">
+        <!-- LEFT SIDEBAR (15%) -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span>📊</span> OAEC
             </div>
 
-            <div class="gauges-grid">
-                <!-- Total Equipment Card -->
-                <div class="gauge-card" id="gauge-card-total" onclick="filterByGauge('ALL')">
-                    <div class="gauge-title">Total Equipment Repairs</div>
-                    <div class="svg-gauge-container">
-                        <svg viewBox="0 0 100 100" width="100%" height="100%">
-                            <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#2a8bf2" />
-                            <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
-                            <circle cx="50" cy="50" r="42" id="ring-total" class="gauge-ring-progress" stroke="#2a8bf2" />
-                        </svg>
-                        <div class="gauge-center-text">
-                            <div class="gauge-value" id="stat-total">0</div>
-                            <div class="gauge-subtext">Click for All</div>
-                        </div>
-                    </div>
-                </div>
+            <ul class="sidebar-menu">
+                <li class="menu-category-label">Navigation</li>
+                <li>
+                    <a href="#" class="menu-item active" onclick="switchTab('schedule', this)">
+                        <span class="icon">📋</span>
+                        <span>Equipment Schedule</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item" onclick="switchTab('analytics', this)">
+                        <span class="icon">📈</span>
+                        <span>Reports & Analytics</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
 
-                <!-- Completed (Done) Card -->
-                <div class="gauge-card" id="gauge-card-done" onclick="filterByGauge('DONE')">
-                    <div class="gauge-title">Completed (Done)</div>
-                    <div class="svg-gauge-container">
-                        <svg viewBox="0 0 100 100" width="100%" height="100%">
-                            <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#20c997" />
-                            <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
-                            <circle cx="50" cy="50" r="42" id="ring-done" class="gauge-ring-progress" stroke="#20c997" />
-                        </svg>
-                        <div class="gauge-center-text">
-                            <div class="gauge-value" id="stat-done">0</div>
-                            <div class="gauge-subtext" id="stat-done-pct">0% Rate</div>
-                        </div>
-                    </div>
-                </div>
+        <!-- RIGHT MAIN WRAPPER (85%) -->
+        <div class="main-wrapper">
 
-                <!-- Pending Equipment Card -->
-                <div class="gauge-card" id="gauge-card-notdone" onclick="filterByGauge('NOT DONE')">
-                    <div class="gauge-title">Pending Equipment</div>
-                    <div class="svg-gauge-container">
-                        <svg viewBox="0 0 100 100" width="100%" height="100%">
-                            <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#ff4d4f" />
-                            <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
-                            <circle cx="50" cy="50" r="42" id="ring-notdone" class="gauge-ring-progress" stroke="#ff4d4f" />
-                        </svg>
-                        <div class="gauge-center-text">
-                            <div class="gauge-value" id="stat-notdone">0</div>
-                            <div class="gauge-subtext" id="stat-notdone-pct">0% Pending</div>
+            <!-- CATEGORY 1: EQUIPMENT REPAIR SCHEDULE -->
+            <div id="view-schedule" class="tab-view active-view">
+                <!-- FIXED TOP HEADER -->
+                <header class="fixed-top-header">
+                    <nav class="navbar">
+                        <div class="navbar-title">
+                            Equipment Repair Dashboard
                         </div>
-                    </div>
-                </div>
+                        <div class="navbar-right">
+                            <div class="auto-refresh-container">
+                                <input 
+                                    type="checkbox" 
+                                    id="auto-refresh-toggle" 
+                                    onchange="toggleAutoRefresh(this.checked)"
+                                    checked
+                                >
+                                <label for="auto-refresh-toggle" class="auto-refresh-label">
+                                    Auto-Refresh (60s)
+                                </label>
+                            </div>
+                            <button class="btn-sync" id="top-sync-btn" onclick="syncData()">
+                                <span class="sync-icon">🔄</span> Sync Now
+                            </button>
+                        </div>
+                    </nav>
 
-                <!-- PM vs CM Distribution Card -->
-                <div class="gauge-card" id="gauge-card-pmcm" onclick="togglePmCmGauge()">
-                    <div class="gauge-title">PM vs CM Distribution</div>
-                    <div class="svg-gauge-container">
-                        <svg viewBox="0 0 100 100" width="100%" height="100%">
-                            <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#00d3d5" />
-                            <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
-                            <circle cx="50" cy="50" r="42" id="ring-pmcm" class="gauge-ring-progress" stroke="#00d3d5" />
-                        </svg>
-                        <div class="gauge-center-text">
-                            <div class="gauge-value" id="stat-pmcm-counts">0 / 0</div>
-                            <div class="gauge-subtext" id="stat-pmcm-ratio">PM vs CM</div>
+                    <div class="top-dashboard-section">
+                        <div class="info-banner">
+                            <div class="info-group">
+                                <span class="info-label">Date Today:</span>
+                                <span class="info-val" id="header-date-today">--</span>
+                            </div>
+
+                            <div class="info-group">
+                                <span class="info-label">Repair Type:</span>
+                                <div class="repair-type-group">
+                                    <button class="type-btn active" id="btn-type-all" onclick="setRepairTypeFilter('')">ALL</button>
+                                    <button class="type-btn" id="btn-type-pm" onclick="setRepairTypeFilter('PM')">PM</button>
+                                    <button class="type-btn" id="btn-type-cm" onclick="setRepairTypeFilter('CM')">CM</button>
+                                </div>
+                            </div>
+
+                            <div class="info-group">
+                                <span class="info-label">Select Week:</span>
+                                <select class="week-select-top" id="week-select">
+                                    <option value="">All Weeks</option>
+                                </select>
+                            </div>
+                            
+                            <div class="info-group">
+                                <span class="info-label">Week Duration:</span>
+                                <span class="info-val" id="header-week-range">--</span>
+                            </div>
+                        </div>
+
+                        <div class="gauges-grid">
+                            <!-- Total Equipment Card -->
+                            <div class="gauge-card" id="gauge-card-total" onclick="filterByGauge('ALL')">
+                                <div class="gauge-title">Total Equipment Repairs</div>
+                                <div class="svg-gauge-container">
+                                    <svg viewBox="0 0 100 100" width="100%" height="100%">
+                                        <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#2a8bf2" />
+                                        <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
+                                        <circle cx="50" cy="50" r="42" id="ring-total" class="gauge-ring-progress" stroke="#2a8bf2" />
+                                    </svg>
+                                    <div class="gauge-center-text">
+                                        <div class="gauge-value" id="stat-total">0</div>
+                                        <div class="gauge-subtext">Click for All</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Completed (Done) Card -->
+                            <div class="gauge-card" id="gauge-card-done" onclick="filterByGauge('DONE')">
+                                <div class="gauge-title">Completed (Done)</div>
+                                <div class="svg-gauge-container">
+                                    <svg viewBox="0 0 100 100" width="100%" height="100%">
+                                        <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#20c997" />
+                                        <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
+                                        <circle cx="50" cy="50" r="42" id="ring-done" class="gauge-ring-progress" stroke="#20c997" />
+                                    </svg>
+                                    <div class="gauge-center-text">
+                                        <div class="gauge-value" id="stat-done">0</div>
+                                        <div class="gauge-subtext" id="stat-done-pct">0% Rate</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pending Equipment Card -->
+                            <div class="gauge-card" id="gauge-card-notdone" onclick="filterByGauge('NOT DONE')">
+                                <div class="gauge-title">Pending Equipment</div>
+                                <div class="svg-gauge-container">
+                                    <svg viewBox="0 0 100 100" width="100%" height="100%">
+                                        <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#ff4d4f" />
+                                        <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
+                                        <circle cx="50" cy="50" r="42" id="ring-notdone" class="gauge-ring-progress" stroke="#ff4d4f" />
+                                    </svg>
+                                    <div class="gauge-center-text">
+                                        <div class="gauge-value" id="stat-notdone">0</div>
+                                        <div class="gauge-subtext" id="stat-notdone-pct">0% Pending</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PM vs CM Distribution Card -->
+                            <div class="gauge-card" id="gauge-card-pmcm" onclick="togglePmCmGauge()">
+                                <div class="gauge-title">PM vs CM Distribution</div>
+                                <div class="svg-gauge-container">
+                                    <svg viewBox="0 0 100 100" width="100%" height="100%">
+                                        <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#00d3d5" />
+                                        <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
+                                        <circle cx="50" cy="50" r="42" id="ring-pmcm" class="gauge-ring-progress" stroke="#00d3d5" />
+                                    </svg>
+                                    <div class="gauge-center-text">
+                                        <div class="gauge-value" id="stat-pmcm-counts">0 / 0</div>
+                                        <div class="gauge-subtext" id="stat-pmcm-ratio">PM vs CM</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </header>
+
+                <!-- SCROLLABLE LOWER AREA -->
+                <main class="scrollable-content">
+                    <div class="table-panel">
+                        <div class="table-header-bar">
+                            <div class="table-title">
+                                📋 Equipment Repair Schedule
+                            </div>
+                            <div class="table-controls">
+                                <select class="control-select" id="location-filter">
+                                    <option value="">All Locations</option>
+                                </select>
+                                <select class="control-select" id="status-filter">
+                                    <option value="">All Statuses</option>
+                                    <option value="DONE">DONE</option>
+                                    <option value="NOT DONE">NOT DONE</option>
+                                </select>
+                                <button class="btn btn-outline" onclick="resetDisplay()">Reset Filters</button>
+                                <button class="btn btn-primary" onclick="exportData()">Export CSV</button>
+                            </div>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table id="repair-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-unit">Unit No</th>
+                                        <th class="col-type">Repair Type</th>
+                                        <th class="col-desc">Repair Description</th>
+                                        <th class="col-duration">Duration</th>
+                                        <th class="col-location">Location</th>
+                                        <th class="col-status">Status</th>
+                                        <th class="col-remarks">Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-body">
+                                    <tr><td colspan="7" class="empty-row">Loading schedule...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="table-footer">
+                            <div class="pagination-info" id="pagination-info">Showing 0 entries</div>
+                            <div class="pagination-actions">
+                                <button class="btn btn-outline" id="prev-btn" onclick="changePage(-1)" disabled>Previous</button>
+                                <button class="btn btn-outline" id="next-btn" onclick="changePage(1)" disabled>Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+
+            <!-- CATEGORY 2: REPORTING / ANALYTICS (PLACEHOLDER FOR NEXT STEP) -->
+            <div id="view-analytics" class="tab-view">
+                <nav class="navbar">
+                    <div class="navbar-title">
+                        Reports & Analytics
+                    </div>
+                </nav>
+                <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                    <h2>📈 Reporting & Analytics Section</h2>
+                    <p style="margin-top: 0.5rem;">Placeholder section — ready for discussion once Item #1 is finalized.</p>
                 </div>
             </div>
+
         </div>
-    </header>
-
-    <!-- SCROLLABLE LOWER AREA -->
-    <main class="scrollable-content">
-        <div class="table-panel">
-            <div class="table-header-bar">
-                <div class="table-title">
-                    📋 Equipment Repair Schedule
-                </div>
-                <div class="table-controls">
-                    <select class="control-select" id="location-filter">
-                        <option value="">All Locations</option>
-                    </select>
-                    <select class="control-select" id="status-filter">
-                        <option value="">All Statuses</option>
-                        <option value="DONE">DONE</option>
-                        <option value="NOT DONE">NOT DONE</option>
-                    </select>
-                    <button class="btn btn-outline" onclick="resetDisplay()">Reset Filters</button>
-                    <button class="btn btn-primary" onclick="exportData()">Export CSV</button>
-                </div>
-            </div>
-
-            <div class="table-wrapper">
-                <table id="repair-table">
-                    <thead>
-                        <tr>
-                            <th class="col-unit">Unit No</th>
-                            <th class="col-type">Repair Type</th>
-                            <th class="col-desc">Repair Description</th>
-                            <th class="col-duration">Duration</th>
-                            <th class="col-location">Location</th>
-                            <th class="col-status">Status</th>
-                            <th class="col-remarks">Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body">
-                        <tr><td colspan="7" class="empty-row">Loading schedule...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="table-footer">
-                <div class="pagination-info" id="pagination-info">Showing 0 entries</div>
-                <div class="pagination-actions">
-                    <button class="btn btn-outline" id="prev-btn" onclick="changePage(-1)" disabled>Previous</button>
-                    <button class="btn btn-outline" id="next-btn" onclick="changePage(1)" disabled>Next</button>
-                </div>
-            </div>
-        </div>
-    </main>
+    </div>
 
     <!-- Update Equipment Modal -->
     <div id="update-modal" class="modal" style="display: none;">
@@ -1145,6 +1276,18 @@
         let selectedRepairType = '';
         let pendingUpdateId = null;
         let pendingNewStatus = null;
+
+        function switchTab(viewName, element) {
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+            if (element) element.classList.add('active');
+
+            document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active-view'));
+            if (viewName === 'schedule') {
+                document.getElementById('view-schedule').classList.add('active-view');
+            } else if (viewName === 'analytics') {
+                document.getElementById('view-analytics').classList.add('active-view');
+            }
+        }
 
         function parseRawDate(rawDate) {
             if (!rawDate) return null;
@@ -1696,24 +1839,13 @@
                 return "📊 No repair data available yet. Please sync your data first!";
             }
 
-            // ===== CALCULATE KEY METRICS =====
             const done = parsedDataList.filter(r => r.status.toLowerCase() === 'done').length;
             const pending = total - done;
             const completionRate = total > 0 ? Math.round((done / total) * 100) : 0;
             
             const pm = parsedDataList.filter(r => r.repairType.toUpperCase().includes('PM')).length;
             const cm = parsedDataList.filter(r => r.repairType.toUpperCase().includes('CM')).length;
-            
-            const locations = [...new Set(parsedDataList.map(r => r.location).filter(Boolean))];
-            const locationStats = {};
-            locations.forEach(loc => {
-                locationStats[loc] = {
-                    total: parsedDataList.filter(r => r.location === loc).length,
-                    done: parsedDataList.filter(r => r.location === loc && r.status.toLowerCase() === 'done').length
-                };
-            });
 
-            // ===== 1. SEARCH BY UNIT NUMBER =====
             const numberMatch = query.match(/(\w+-?\d+|\d+)/);
             if (numberMatch) {
                 const searchTerm = numberMatch[0];
@@ -1728,75 +1860,10 @@
                 }
             }
 
-            // ===== 2. STATUS & SUMMARY QUERIES =====
             if (query.includes('status') || query.includes('summary') || query.includes('overview') || query.includes('progress')) {
                 return `📊 **Repair Status Summary**\n\n✅ Completed: ${done}/${total} (${completionRate}%)\n⏳ Pending: ${pending}\n\n🔧 Breakdown:\n  • PM Tasks: ${pm}\n  • CM Tasks: ${cm}\n\n${completionRate >= 80 ? '🎉 Great progress!' : completionRate >= 50 ? '💪 Keep pushing!' : '⚡ Need to accelerate!'}`;
             }
 
-            // ===== 3. PENDING/NOT DONE QUERIES =====
-            if (query.includes('pending') || query.includes('not done') || query.includes('urgent') || query.includes('todo')) {
-                const pendingList = parsedDataList.filter(r => r.status.toLowerCase() !== 'done');
-                if (pendingList.length === 0) {
-                    return "🎉 Excellent! All repairs are completed!";
-                }
-                const topPending = pendingList.slice(0, 5).map(r => `• ${r.unitNo} - ${r.repairType} (${r.location})`).join('\n');
-                return `⏳ **${pending} Pending Repairs**\n\nTop pending items:\n${topPending}\n\n💡 Tip: Focus on these to increase completion rate!`;
-            }
-
-            // ===== 4. PM/CM RATIO & TYPE QUERIES =====
-            if (query.includes('pm') || query.includes('cm') || query.includes('type') || query.includes('repair type')) {
-                const pmDone = parsedDataList.filter(r => r.repairType.toUpperCase().includes('PM') && r.status.toLowerCase() === 'done').length;
-                const cmDone = parsedDataList.filter(r => r.repairType.toUpperCase().includes('CM') && r.status.toLowerCase() === 'done').length;
-                const pmPending = pm - pmDone;
-                const cmPending = cm - cmDone;
-                
-                return `🔧 **Repair Type Breakdown**\n\n📋 PM (Preventive Maintenance):\n  Total: ${pm} | Done: ${pmDone} | Pending: ${pmPending}\n\n🔨 CM (Corrective Maintenance):\n  Total: ${cm} | Done: ${cmDone} | Pending: ${cmPending}\n\nPM Completion: ${pm > 0 ? Math.round((pmDone/pm)*100) : 0}%\nCM Completion: ${cm > 0 ? Math.round((cmDone/cm)*100) : 0}%`;
-            }
-
-            // ===== 5. LOCATION QUERIES =====
-            if (query.includes('location') || query.includes('by location') || query.includes('where')) {
-                const locationSummary = Object.entries(locationStats)
-                    .map(([loc, stats]) => `• ${loc}: ${stats.done}/${stats.total} done`)
-                    .join('\n');
-                return `📍 **Repairs by Location**\n\n${locationSummary}\n\n💡 Which location needs most attention?`;
-            }
-
-            // ===== 6. PERFORMANCE & INSIGHTS =====
-            if (query.includes('performance') || query.includes('how') || query.includes('doing') || query.includes('progress')) {
-                let insight = '';
-                if (completionRate >= 90) {
-                    insight = '🌟 Outstanding performance! You\'re nearly done!';
-                } else if (completionRate >= 70) {
-                    insight = '👍 Good progress! Keep the momentum going!';
-                } else if (completionRate >= 50) {
-                    insight = '⚡ Halfway there! Let\'s finish strong!';
-                } else {
-                    insight = '📈 Early stage. Focus on high-priority items!';
-                }
-                return `${insight}\n\nCurrent Rate: ${completionRate}%\nCompleted: ${done}/${total}\nRemaining: ${pending}`;
-            }
-
-            // ===== 7. DURATION/TIME QUERIES =====
-            if (query.includes('duration') || query.includes('time') || query.includes('how long')) {
-                const durations = parsedDataList.map(r => r.duration).filter(Boolean);
-                const uniqueDurations = [...new Set(durations)];
-                return `⏱️ **Repair Durations**\n\nTask Durations Scheduled:\n${uniqueDurations.slice(0, 8).map(d => `• ${d}`).join('\n')}\n\n💡 Use this to plan your schedule better!`;
-            }
-
-            // ===== 8. LOCATION PERFORMANCE =====
-            if (query.includes('best location') || query.includes('most productive')) {
-                const best = Object.entries(locationStats).reduce((a, b) => 
-                    (b[1].total > 0 ? b[1].done / b[1].total : 0) > (a[1].total > 0 ? a[1].done / a[1].total : 0) ? b : a
-                );
-                return `🏆 **Best Performing Location**\n\n📍 ${best[0]}\nCompletion Rate: ${best[1].total > 0 ? Math.round((best[1].done / best[1].total) * 100) : 0}%\nDone: ${best[1].done}/${best[1].total}`;
-            }
-
-            // ===== 9. HELP & EXAMPLES =====
-            if (query.includes('help') || query.includes('what') || query.includes('how can') || query === '') {
-                return `👐 **I can help you with:**\n\n📊 Ask about overall status\n🔍 Search a unit (e.g., "SV-391")\n📋 Repair types (PM/CM breakdown)\n📍 Location performance\n⏳ Pending repairs\n🎯 Performance insights\n⏱️ Repair durations\n\nWhat would you like to know?`;
-            }
-
-            // ===== 10. DEFAULT SMART RESPONSE =====
             return `I understand you're asking about: "${userText}"\n\nHere's what I know:\n• Total repairs: ${total}\n• Completed: ${done} (${completionRate}%)\n• Pending: ${pending}\n\nTry asking about status, pending items, locations, or search a specific unit!`;
         }
 
