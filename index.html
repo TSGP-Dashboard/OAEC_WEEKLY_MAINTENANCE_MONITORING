@@ -327,101 +327,6 @@
             color: var(--text-primary);
         }
 
-        /* COMPACT GAUGES */
-        .gauges-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 0.75rem;
-        }
-
-        .gauge-card {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 8px;
-            padding: 0.75rem 0.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            position: relative;
-            box-shadow: var(--card-shadow);
-        }
-
-        .gauge-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent-cyan);
-        }
-
-        .gauge-card.active-filter {
-            border: 1px solid var(--accent-cyan);
-            box-shadow: 0 0 12px var(--active-ring);
-        }
-
-        .gauge-title {
-            font-size: 0.68rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 0.4rem;
-            letter-spacing: 0.5px;
-            text-align: center;
-        }
-
-        .svg-gauge-container {
-            width: 95px;
-            height: 95px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .gauge-ring-bg {
-            fill: none;
-            stroke: rgba(255, 255, 255, 0.06);
-            stroke-width: 10;
-        }
-
-        .gauge-ring-progress {
-            fill: none;
-            stroke-width: 10;
-            stroke-linecap: round;
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-            transition: stroke-dasharray 0.8s ease-out;
-        }
-
-        .gauge-center-circle {
-            transition: fill 0.3s ease;
-        }
-
-        .gauge-center-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            width: 80px;
-            pointer-events: none;
-        }
-
-        .gauge-value {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            line-height: 1.1;
-        }
-
-        .gauge-subtext {
-            font-size: 0.58rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
         /* COMPACT TABLE PANEL */
         .table-panel {
             background: var(--panel-bg);
@@ -1067,72 +972,6 @@
                                 <span class="info-val" id="header-week-range">--</span>
                             </div>
                         </div>
-
-                        <div class="gauges-grid">
-                            <!-- Total Equipment Card -->
-                            <div class="gauge-card" id="gauge-card-total" onclick="filterByGauge('ALL')">
-                                <div class="gauge-title">Total Equipment Repairs</div>
-                                <div class="svg-gauge-container">
-                                    <svg viewBox="0 0 100 100" width="100%" height="100%">
-                                        <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#2a8bf2" />
-                                        <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
-                                        <circle cx="50" cy="50" r="42" id="ring-total" class="gauge-ring-progress" stroke="#2a8bf2" />
-                                    </svg>
-                                    <div class="gauge-center-text">
-                                        <div class="gauge-value" id="stat-total">0</div>
-                                        <div class="gauge-subtext">Click for All</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Completed (Done) Card -->
-                            <div class="gauge-card" id="gauge-card-done" onclick="filterByGauge('DONE')">
-                                <div class="gauge-title">Completed (Done)</div>
-                                <div class="svg-gauge-container">
-                                    <svg viewBox="0 0 100 100" width="100%" height="100%">
-                                        <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#20c997" />
-                                        <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
-                                        <circle cx="50" cy="50" r="42" id="ring-done" class="gauge-ring-progress" stroke="#20c997" />
-                                    </svg>
-                                    <div class="gauge-center-text">
-                                        <div class="gauge-value" id="stat-done">0</div>
-                                        <div class="gauge-subtext" id="stat-done-pct">0% Rate</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Pending Equipment Card -->
-                            <div class="gauge-card" id="gauge-card-notdone" onclick="filterByGauge('NOT DONE')">
-                                <div class="gauge-title">Pending Equipment</div>
-                                <div class="svg-gauge-container">
-                                    <svg viewBox="0 0 100 100" width="100%" height="100%">
-                                        <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#ff4d4f" />
-                                        <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
-                                        <circle cx="50" cy="50" r="42" id="ring-notdone" class="gauge-ring-progress" stroke="#ff4d4f" />
-                                    </svg>
-                                    <div class="gauge-center-text">
-                                        <div class="gauge-value" id="stat-notdone">0</div>
-                                        <div class="gauge-subtext" id="stat-notdone-pct">0% Pending</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- PM vs CM Distribution Card -->
-                            <div class="gauge-card" id="gauge-card-pmcm" onclick="togglePmCmGauge()">
-                                <div class="gauge-title">PM vs CM Distribution</div>
-                                <div class="svg-gauge-container">
-                                    <svg viewBox="0 0 100 100" width="100%" height="100%">
-                                        <circle cx="50" cy="50" r="32" class="gauge-center-circle" fill="#00d3d5" />
-                                        <circle cx="50" cy="50" r="42" class="gauge-ring-bg" />
-                                        <circle cx="50" cy="50" r="42" id="ring-pmcm" class="gauge-ring-progress" stroke="#00d3d5" />
-                                    </svg>
-                                    <div class="gauge-center-text">
-                                        <div class="gauge-value" id="stat-pmcm-counts">0 / 0</div>
-                                        <div class="gauge-subtext" id="stat-pmcm-ratio">PM vs CM</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </header>
 
@@ -1196,7 +1035,7 @@
                 </nav>
                 <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
                     <h2>📈 Reporting & Analytics Section</h2>
-                    <p style="margin-top: 0.5rem;">Placeholder section — ready for discussion once Item #1 is finalized.</p>
+                    <p style="margin-top: 0.5rem;">Placeholder section — ready to build out charts and summary widgets next!</p>
                 </div>
             </div>
 
@@ -1543,16 +1382,6 @@
             renderTable();
         }
 
-        function togglePmCmGauge() {
-            if (selectedRepairType === 'PM') {
-                setRepairTypeFilter('CM');
-            } else if (selectedRepairType === 'CM') {
-                setRepairTypeFilter('');
-            } else {
-                setRepairTypeFilter('PM');
-            }
-        }
-
         function updateTopHeaderInfo() {
             const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' }).replace(/ /g, '-');
             document.getElementById('header-date-today').textContent = todayStr;
@@ -1709,7 +1538,11 @@
             highlightActiveGaugeCard();
         }
 
+        // Updated with null-checks to avoid errors when gauges are removed
         function updateStatsAndGauges(filteredData) {
+            const statTotal = document.getElementById('stat-total');
+            if (!statTotal) return; // Exit gracefully if elements are not present in current DOM
+
             const total = filteredData.length;
             const done = filteredData.filter(r => r.status.toLowerCase() === 'done').length;
             const notDone = filteredData.filter(r => r.status.toLowerCase() !== 'done').length;
@@ -1720,16 +1553,26 @@
             const donePct = total > 0 ? Math.round((done / total) * 100) : 0;
             const notDonePct = total > 0 ? Math.round((notDone / total) * 100) : 0;
 
-            document.getElementById('stat-total').textContent = total;
-            document.getElementById('stat-done').textContent = `${donePct}%`;
-            document.getElementById('stat-done-pct').textContent = `${done} Done`;
+            statTotal.textContent = total;
+            
+            const statDone = document.getElementById('stat-done');
+            if (statDone) statDone.textContent = `${donePct}%`;
+            
+            const statDonePct = document.getElementById('stat-done-pct');
+            if (statDonePct) statDonePct.textContent = `${done} Done`;
 
-            document.getElementById('stat-notdone').textContent = `${notDonePct}%`;
-            document.getElementById('stat-notdone-pct').textContent = `${notDone} Pending`;
+            const statNotDone = document.getElementById('stat-notdone');
+            if (statNotDone) statNotDone.textContent = `${notDonePct}%`;
+
+            const statNotDonePct = document.getElementById('stat-notdone-pct');
+            if (statNotDonePct) statNotDonePct.textContent = `${notDone} Pending`;
 
             const pmPct = (pmCount + cmCount) > 0 ? Math.round((pmCount / (pmCount + cmCount)) * 100) : 0;
-            document.getElementById('stat-pmcm-counts').textContent = `${pmPct}%`;
-            document.getElementById('stat-pmcm-ratio').textContent = `${pmCount} PM / ${cmCount} CM`;
+            const statPmcmCounts = document.getElementById('stat-pmcm-counts');
+            if (statPmcmCounts) statPmcmCounts.textContent = `${pmPct}%`;
+
+            const statPmcmRatio = document.getElementById('stat-pmcm-ratio');
+            if (statPmcmRatio) statPmcmRatio.textContent = `${pmCount} PM / ${cmCount} CM`;
 
             const circumference = 263.89;
 
@@ -1747,22 +1590,27 @@
             el.setAttribute('stroke-dasharray', `${dashVal} ${circumference}`);
         }
 
+        // Updated with null-checks to avoid errors when gauges are removed
         function highlightActiveGaugeCard() {
+            const cards = ['gauge-card-total', 'gauge-card-done', 'gauge-card-notdone', 'gauge-card-pmcm'];
+            cards.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active-filter');
+            });
+
             const statusVal = document.getElementById('status-filter').value;
-            document.getElementById('gauge-card-total').classList.remove('active-filter');
-            document.getElementById('gauge-card-done').classList.remove('active-filter');
-            document.getElementById('gauge-card-notdone').classList.remove('active-filter');
-            document.getElementById('gauge-card-pmcm').classList.remove('active-filter');
+            let activeCardId = 'gauge-card-total';
 
             if (selectedRepairType) {
-                document.getElementById('gauge-card-pmcm').classList.add('active-filter');
+                activeCardId = 'gauge-card-pmcm';
             } else if (statusVal === 'DONE') {
-                document.getElementById('gauge-card-done').classList.add('active-filter');
+                activeCardId = 'gauge-card-done';
             } else if (statusVal === 'NOT DONE') {
-                document.getElementById('gauge-card-notdone').classList.add('active-filter');
-            } else {
-                document.getElementById('gauge-card-total').classList.add('active-filter');
+                activeCardId = 'gauge-card-notdone';
             }
+
+            const activeCard = document.getElementById(activeCardId);
+            if (activeCard) activeCard.classList.add('active-filter');
         }
 
         function showError(message) {
