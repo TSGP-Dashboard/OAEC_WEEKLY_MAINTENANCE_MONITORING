@@ -137,6 +137,19 @@
             overflow: hidden;
         }
 
+        /* View switching with flex containers */
+        .tab-view {
+            display: none;
+            height: 100%;
+            width: 100%;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .tab-view.active-view {
+            display: flex;
+        }
+
         .fixed-top-header {
             flex-shrink: 0;
             background: var(--bg-main);
@@ -232,6 +245,7 @@
 
         .scrollable-content {
             flex: 1;
+            min-height: 0; /* Allows container to shrink and scroll */
             overflow-y: auto;
             padding: 0.5rem 1.25rem 1.25rem 1.25rem;
             width: 100%;
@@ -415,6 +429,8 @@
             border-radius: 8px;
             box-shadow: var(--card-shadow);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
             margin-bottom: 1rem;
         }
 
@@ -427,6 +443,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .table-title {
@@ -494,6 +511,8 @@
 
         .table-wrapper {
             overflow-x: auto;
+            overflow-y: auto;
+            flex: 1;
         }
 
         table {
@@ -630,6 +649,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 0.5rem;
+            flex-shrink: 0;
         }
 
         .pagination-info {
@@ -962,15 +982,6 @@
         .ai-chat-send:hover {
             background: #00e5e8;
         }
-
-        /* View switching */
-        .tab-view {
-            display: none;
-        }
-
-        .tab-view.active-view {
-            display: block;
-        }
     </style>
 </head>
 <body>
@@ -1176,7 +1187,7 @@
                 </main>
             </div>
 
-            <!-- CATEGORY 2: REPORTING / ANALYTICS (PLACEHOLDER FOR NEXT STEP) -->
+            <!-- CATEGORY 2: REPORTING / ANALYTICS (PLACEHOLDER) -->
             <div id="view-analytics" class="tab-view">
                 <nav class="navbar">
                     <div class="navbar-title">
