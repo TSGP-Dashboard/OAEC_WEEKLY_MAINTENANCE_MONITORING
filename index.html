@@ -1270,7 +1270,7 @@
             STATUS: 8,
             PIC: 9,
             REMARKS: 10,
-            REGION: 12 // Column L
+            REGION: 11 // Column L
         };
 
         let parsedDataList = [];
@@ -1314,10 +1314,16 @@
 
                 const data = await response.json();
 
+                // Object array format from Apps Script
                 if (data.length > 0 && data[0].unitNo !== undefined) {
-                    return data;
+                    return data.map((item, index) => ({
+                        ...item,
+                        id: index,
+                        region: String(item.region || item.Region || item.REGION || item[11] || '').trim()
+                    }));
                 }
 
+                // Raw 2D Array format
                 const hasHeader = data.length > 0 && String(data[0][0]).toLowerCase().includes('unit');
                 const rows = hasHeader ? data.slice(1) : data;
 
@@ -1325,6 +1331,7 @@
                     if (!row || row.length === 0 || !row[COLUMN_MAP.UNIT_NO]) return null;
 
                     const sheetRowIndex = hasHeader ? index + 2 : index + 1;
+                    const regionVal = row[COLUMN_MAP.REGION] !== undefined ? String(row[COLUMN_MAP.REGION]).trim() : '';
 
                     return {
                         id: index,
@@ -1342,7 +1349,7 @@
                         status: row[COLUMN_MAP.STATUS] || 'NOT DONE',
                         pic: row[COLUMN_MAP.PIC] || '',
                         remarks: row[COLUMN_MAP.REMARKS] || '',
-                        region: String(row[COLUMN_MAP.REGION] || '').trim() // Column L
+                        region: regionVal
                     };
                 }).filter(Boolean);
             } catch (error) {
@@ -1602,24 +1609,31 @@
             const locations = [...new Set(parsedDataList.map(r => r.location).filter(Boolean))]
                 .filter(loc => !/\b(hour|hours|hr|hrs|day|days)\b/i.test(loc)).sort();
 
-            const regions = [...new Set(parsedDataList.map(r => r.region).filter(Boolean))].sort();
+            // Safe & Clean Region extraction from Column L
+            const regions = [...new Set(
+                parsedDataList
+                    .map(r => r.region)
+                    .filter(reg => reg && reg.toUpperCase() !== 'REGION' && reg.toUpperCase() !== 'REGIONS')
+            )].sort();
 
             populateSelect('week-select', weeks, 'Week ');
             populateSelect('location-filter', locations);
 
-            // Populate Reports & Analytics Region Filters (Column L)
+            // Populate Reports & Analytics Region Filters
             ['pmWeeklyRegion', 'cmWeeklyRegion', 'pmMonthlyRegion', 'cmMonthlyRegion'].forEach(id => {
                 const select = document.getElementById(id);
                 if (select) {
                     const currentVal = select.value;
                     while (select.options.length > 1) select.remove(1);
+                    
                     regions.forEach(reg => {
                         const opt = document.createElement('option');
                         opt.value = reg;
                         opt.textContent = reg;
                         select.appendChild(opt);
                     });
-                    select.value = currentVal || 'ALL';
+                    
+                    select.value = regions.includes(currentVal) ? currentVal : 'ALL';
                 }
             });
         }
