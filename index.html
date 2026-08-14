@@ -577,7 +577,7 @@
             font-style: italic;
         }
 
-        /* REPORTS & ANALYTICS CHARTS STYLING */
+        /* REPORTS & ANALYTICS STYLING */
         .analytics-container {
             flex: 1;
             overflow-y: auto;
@@ -585,6 +585,102 @@
             display: flex;
             flex-direction: column;
             gap: 1.25rem;
+        }
+
+        /* KPI Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .kpi-card {
+            background-color: var(--panel-bg);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            border: 1px solid var(--panel-border);
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .kpi-card.cyan::before { background-color: var(--accent-cyan); }
+        .kpi-card.pink::before { background-color: var(--accent-pink); }
+        .kpi-card.orange::before { background-color: var(--accent-orange); }
+        .kpi-card.green::before { background-color: var(--accent-green); }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .kpi-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-icon {
+            font-size: 1.2rem;
+        }
+
+        .kpi-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .kpi-subtext {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .kpi-subtext span {
+            font-weight: 700;
+        }
+
+        /* Target Config Banner */
+        .target-config-banner {
+            background-color: var(--panel-bg);
+            border-radius: 8px;
+            padding: 0.75rem 1.25rem;
+            border: 1px solid var(--panel-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .target-config-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .target-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
 
         /* Stacked Weekly Charts Container (Full Width) */
@@ -1000,13 +1096,13 @@
             <ul class="sidebar-menu">
                 <li class="menu-category-label">Navigation</li>
                 <li>
-                    <a href="#" class="menu-item active" onclick="switchTab('schedule', this)">
+                    <a href="#" class="menu-item active" id="nav-item-schedule" onclick="switchTab('schedule', this)">
                         <span class="icon">📋</span>
                         <span>Equipment Schedule</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="menu-item" onclick="switchTab('analytics', this)">
+                    <a href="#" class="menu-item" id="nav-item-analytics" onclick="switchTab('analytics', this)">
                         <span class="icon">📈</span>
                         <span>Reports & Analytics</span>
                     </a>
@@ -1134,12 +1230,67 @@
                 </nav>
 
                 <div class="analytics-container">
+                    <!-- KPI SUMMARY CARDS -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card cyan">
+                            <div class="kpi-header">
+                                <span class="kpi-title">PM Compliance</span>
+                                <span class="kpi-icon">🛠️</span>
+                            </div>
+                            <div class="kpi-value" id="kpi-pm-compliance">--%</div>
+                            <div class="kpi-subtext"><span id="kpi-pm-done">0</span> / <span id="kpi-pm-total">0</span> Tasks Completed</div>
+                        </div>
+
+                        <div class="kpi-card pink">
+                            <div class="kpi-header">
+                                <span class="kpi-title">CM Compliance</span>
+                                <span class="kpi-icon">⚡</span>
+                            </div>
+                            <div class="kpi-value" id="kpi-cm-compliance">--%</div>
+                            <div class="kpi-subtext"><span id="kpi-cm-done">0</span> / <span id="kpi-cm-total">0</span> Repairs Resolved</div>
+                        </div>
+
+                        <div class="kpi-card orange">
+                            <div class="kpi-header">
+                                <span class="kpi-title">Pending Tasks</span>
+                                <span class="kpi-icon">⏳</span>
+                            </div>
+                            <div class="kpi-value" id="kpi-pending-total">--</div>
+                            <div class="kpi-subtext"><span id="kpi-pending-pm">0</span> PMs &amp; <span id="kpi-pending-cm">0</span> CMs Outstanding</div>
+                        </div>
+
+                        <div class="kpi-card green">
+                            <div class="kpi-header">
+                                <span class="kpi-title">Overall Health</span>
+                                <span class="kpi-icon">🎯</span>
+                            </div>
+                            <div class="kpi-value" id="kpi-overall-compliance">--%</div>
+                            <div class="kpi-subtext">Benchmark: <span id="kpi-benchmark-text">85%</span> Target</div>
+                        </div>
+                    </div>
+
+                    <!-- TARGET BENCHMARK BANNER -->
+                    <div class="target-config-banner">
+                        <div class="target-config-title">
+                            ⚙️ Target Compliance Threshold
+                        </div>
+                        <div class="target-controls">
+                            <span class="info-label">Set Global Target:</span>
+                            <select id="targetBenchmarkSelect" class="analytics-select" onchange="updateTargetBenchmark(this.value)">
+                                <option value="80">80% Target</option>
+                                <option value="85" selected>85% Standard Target</option>
+                                <option value="90">90% High Performance</option>
+                                <option value="95">95% Critical Benchmark</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- STACKED WEEKLY CHARTS SECTION (FULL-WIDTH) -->
                     <div class="weekly-charts-container">
                         <!-- Chart 1: PM Weekly Trend -->
                         <div class="chart-card">
                             <div class="chart-header">
-                                <div class="chart-title">PM Weekly Compliance Trend</div>
+                                <div class="chart-title">PM Weekly Compliance Trend <small style="font-size:0.7rem; color:var(--text-muted); text-transform:none;">(Click bar to view week)</small></div>
                                 <div class="chart-controls">
                                     <select id="pmWeeklyRegion" class="analytics-select" onchange="renderAnalyticsCharts()">
                                         <option value="ALL">All Regions</option>
@@ -1155,7 +1306,7 @@
                         <!-- Chart 2: CM Weekly Trend -->
                         <div class="chart-card">
                             <div class="chart-header">
-                                <div class="chart-title">CM Weekly Compliance Trend</div>
+                                <div class="chart-title">CM Weekly Compliance Trend <small style="font-size:0.7rem; color:var(--text-muted); text-transform:none;">(Click bar to view week)</small></div>
                                 <div class="chart-controls">
                                     <select id="cmWeeklyRegion" class="analytics-select" onchange="renderAnalyticsCharts()">
                                         <option value="ALL">All Regions</option>
@@ -1295,10 +1446,16 @@
         let pendingUpdateId = null;
         let pendingNewStatus = null;
         let analyticsCharts = {};
+        let currentTargetBenchmark = 85;
 
         function switchTab(viewName, element) {
             document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-            if (element) element.classList.add('active');
+            if (element) {
+                element.classList.add('active');
+            } else {
+                const targetId = viewName === 'schedule' ? 'nav-item-schedule' : 'nav-item-analytics';
+                document.getElementById(targetId)?.classList.add('active');
+            }
 
             document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active-view'));
             if (viewName === 'schedule') {
@@ -1624,7 +1781,6 @@
             const locations = [...new Set(parsedDataList.map(r => r.location).filter(Boolean))]
                 .filter(loc => !/\b(hour|hours|hr|hrs|day|days)\b/i.test(loc)).sort();
 
-            // Safe & Clean Region extraction from Column L
             const regions = [...new Set(
                 parsedDataList
                     .map(r => r.region)
@@ -1634,7 +1790,6 @@
             populateSelect('week-select', weeks, 'Week ');
             populateSelect('location-filter', locations);
 
-            // Populate Reports & Analytics Region Filters
             ['pmWeeklyRegion', 'cmWeeklyRegion', 'pmMonthlyRegion', 'cmMonthlyRegion'].forEach(id => {
                 const select = document.getElementById(id);
                 if (select) {
@@ -1761,7 +1916,47 @@
             a.click();
         }
 
-        /* --- REPORTS & ANALYTICS CHARTS LOGIC --- */
+        /* --- REPORTS & ANALYTICS MODULE UPGRADES --- */
+        function updateTargetBenchmark(val) {
+            currentTargetBenchmark = parseInt(val, 10) || 85;
+            document.getElementById('kpi-benchmark-text').textContent = `${currentTargetBenchmark}%`;
+            renderAnalyticsCharts();
+        }
+
+        function calculateKpiMetrics() {
+            if (parsedDataList.length === 0) return;
+
+            const pmTasks = parsedDataList.filter(item => item.repairType.toUpperCase().includes('PM'));
+            const pmDone = pmTasks.filter(item => item.status.toLowerCase() === 'done').length;
+            const pmCompliance = pmTasks.length > 0 ? Math.round((pmDone / pmTasks.length) * 100) : 0;
+
+            const cmTasks = parsedDataList.filter(item => item.repairType.toUpperCase().includes('CM'));
+            const cmDone = cmTasks.filter(item => item.status.toLowerCase() === 'done').length;
+            const cmCompliance = cmTasks.length > 0 ? Math.round((cmDone / cmTasks.length) * 100) : 0;
+
+            const pendingPm = pmTasks.length - pmDone;
+            const pendingCm = cmTasks.length - cmDone;
+            const pendingTotal = pendingPm + pendingCm;
+
+            const totalTasks = parsedDataList.length;
+            const totalDone = pmDone + cmDone;
+            const overallCompliance = totalTasks > 0 ? Math.round((totalDone / totalTasks) * 100) : 0;
+
+            document.getElementById('kpi-pm-compliance').textContent = `${pmCompliance}%`;
+            document.getElementById('kpi-pm-done').textContent = pmDone;
+            document.getElementById('kpi-pm-total').textContent = pmTasks.length;
+
+            document.getElementById('kpi-cm-compliance').textContent = `${cmCompliance}%`;
+            document.getElementById('kpi-cm-done').textContent = cmDone;
+            document.getElementById('kpi-cm-total').textContent = cmTasks.length;
+
+            document.getElementById('kpi-pending-total').textContent = pendingTotal;
+            document.getElementById('kpi-pending-pm').textContent = pendingPm;
+            document.getElementById('kpi-pending-cm').textContent = pendingCm;
+
+            document.getElementById('kpi-overall-compliance').textContent = `${overallCompliance}%`;
+        }
+
         function getMonthFromWeekOrDate(item) {
             if (item.rawStart) {
                 return new Date(item.rawStart).toLocaleString('default', { month: 'short' });
@@ -1820,7 +2015,7 @@
             return { labels, plannedVol, actualVol, compliancePct };
         }
 
-        function createDualAxisChart(canvasId) {
+        function createDualAxisChart(canvasId, repairTypeFilter) {
             const canvas = document.getElementById(canvasId);
             if (!canvas) return null;
             const ctx = canvas.getContext('2d');
@@ -1852,7 +2047,7 @@
                         },
                         {
                             type: 'line',
-                            label: 'Target (85%)',
+                            label: 'Target Benchmark',
                             data: [],
                             borderColor: '#ff4d4f',
                             borderDash: [5, 5],
@@ -1881,6 +2076,21 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    onClick: (event, activeElements) => {
+                        if (activeElements.length > 0 && (canvasId === 'pmWeeklyChart' || canvasId === 'cmWeeklyChart')) {
+                            const index = activeElements[0].index;
+                            const chart = analyticsCharts[canvasId];
+                            const label = chart.data.labels[index];
+                            const weekNum = label.replace('W', '');
+                            
+                            // Drill down to main schedule with clicked week and repair type
+                            setRepairTypeFilter(repairTypeFilter);
+                            document.getElementById('week-select').value = weekNum;
+                            updateTopHeaderInfo();
+                            switchTab('schedule');
+                            renderTable();
+                        }
+                    },
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
                         legend: {
@@ -1919,6 +2129,8 @@
         }
 
         function renderAnalyticsCharts() {
+            calculateKpiMetrics();
+
             const chartConfigs = [
                 { id: 'pmWeeklyChart', type: 'PM', group: 'week', filterId: 'pmWeeklyRegion' },
                 { id: 'cmWeeklyChart', type: 'CM', group: 'week', filterId: 'cmWeeklyRegion' },
@@ -1928,7 +2140,7 @@
 
             chartConfigs.forEach(cfg => {
                 if (!analyticsCharts[cfg.id]) {
-                    analyticsCharts[cfg.id] = createDualAxisChart(cfg.id);
+                    analyticsCharts[cfg.id] = createDualAxisChart(cfg.id, cfg.type);
                 }
 
                 const filterElem = document.getElementById(cfg.filterId);
@@ -1939,7 +2151,8 @@
                 if (chart) {
                     chart.data.labels = data.labels;
                     chart.data.datasets[0].data = data.compliancePct;
-                    chart.data.datasets[1].data = new Array(data.labels.length).fill(85);
+                    chart.data.datasets[1].label = `Target (${currentTargetBenchmark}%)`;
+                    chart.data.datasets[1].data = new Array(data.labels.length).fill(currentTargetBenchmark);
                     chart.data.datasets[2].data = data.plannedVol;
                     chart.data.datasets[3].data = data.actualVol;
                     chart.update();
