@@ -1468,7 +1468,12 @@
 
         function parseRawDate(rawDate) {
             if (!rawDate) return null;
-            const d = new Date(rawDate);
+            let d = new Date(rawDate);
+            if (isNaN(d.getTime())) {
+                // Append current year fallback (2026) if date string lacks year format
+                const currentYear = new Date().getFullYear();
+                d = new Date(`${rawDate} ${currentYear}`);
+            }
             return isNaN(d.getTime()) ? null : d;
         }
 
