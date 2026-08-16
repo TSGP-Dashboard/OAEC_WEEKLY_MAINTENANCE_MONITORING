@@ -63,10 +63,16 @@
             border-right: 1px solid var(--panel-border);
             display: flex;
             flex-direction: column;
+            justify-content: space-between; /* Pushes content and clock to ends */
             padding: 1rem 0.75rem;
-            gap: 1.5rem;
             z-index: 101;
             flex-shrink: 0;
+        }
+
+        .sidebar-top {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
         .sidebar-brand {
@@ -127,6 +133,36 @@
 
         .menu-item .icon {
             font-size: 1rem;
+        }
+
+        /* SIDEBAR BOTTOM CLOCK WIDGET */
+        .sidebar-clock-container {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .clock-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .clock-time {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 1px;
         }
 
         /* RIGHT MAIN CONTENT (85%) */
@@ -1089,25 +1125,33 @@
     <div class="app-container">
         <!-- LEFT SIDEBAR (15%) -->
         <aside class="sidebar">
-            <div class="sidebar-brand">
-                <span>📊</span> OAEC
+            <div class="sidebar-top">
+                <div class="sidebar-brand">
+                    <span>📊</span> OAEC
+                </div>
+
+                <ul class="sidebar-menu">
+                    <li class="menu-category-label">Navigation</li>
+                    <li>
+                        <a href="#" class="menu-item active" id="nav-item-schedule" onclick="switchTab('schedule', this)">
+                            <span class="icon">📋</span>
+                            <span>Equipment Schedule</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="menu-item" id="nav-item-analytics" onclick="switchTab('analytics', this)">
+                            <span class="icon">📈</span>
+                            <span>Reports & Analytics</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
 
-            <ul class="sidebar-menu">
-                <li class="menu-category-label">Navigation</li>
-                <li>
-                    <a href="#" class="menu-item active" id="nav-item-schedule" onclick="switchTab('schedule', this)">
-                        <span class="icon">📋</span>
-                        <span>Equipment Schedule</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="menu-item" id="nav-item-analytics" onclick="switchTab('analytics', this)">
-                        <span class="icon">📈</span>
-                        <span>Reports & Analytics</span>
-                    </a>
-                </li>
-            </ul>
+            <!-- LIVE CLOCK WIDGET AT BOTTOM OF SIDEBAR -->
+            <div class="sidebar-clock-container">
+                <span class="clock-label">Local Time</span>
+                <span class="clock-time" id="live-sidebar-clock">00:00:00 AM</span>
+            </div>
         </aside>
 
         <!-- RIGHT MAIN WRAPPER (85%) -->
@@ -1448,6 +1492,23 @@
         let analyticsCharts = {};
         let currentTargetBenchmark = 85;
 
+        /* Live Clock Implementation */
+        function startSidebarClock() {
+            function updateClock() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+                const clockElem = document.getElementById('live-sidebar-clock');
+                if (clockElem) clockElem.textContent = timeString;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
         function switchTab(viewName, element) {
             document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
             if (element) {
@@ -1470,7 +1531,6 @@
             if (!rawDate) return null;
             let d = new Date(rawDate);
             if (isNaN(d.getTime())) {
-                // Append current year fallback (2026) if date string lacks year format
                 const currentYear = new Date().getFullYear();
                 d = new Date(`${rawDate} ${currentYear}`);
             }
@@ -2257,6 +2317,7 @@
         }
 
         async function init() {
+            startSidebarClock();
             await syncData();
             
             const autoRefreshCheckbox = document.getElementById('auto-refresh-toggle');
