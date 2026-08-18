@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OAEC MAINTENANCE DASHBOARD</title>
-    <!-- Chart.js CDN for Dual-Axis Combo Charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -806,6 +805,263 @@
             width: 100%;
         }
 
+        /* --- MODULE 3: EQUIPMENT MAINTENANCE HISTORY STYLING --- */
+        .history-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .history-top-bar {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .history-select-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .history-select-label {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .history-unit-select {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--panel-border);
+            color: var(--accent-cyan);
+            font-size: 1rem;
+            font-weight: 700;
+            padding: 0.45rem 0.85rem;
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+            min-width: 180px;
+        }
+
+        .history-unit-select option {
+            background: var(--panel-bg);
+            color: var(--text-primary);
+        }
+
+        .history-badge-container {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .history-badge {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--panel-border);
+            padding: 0.4rem 0.85rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .history-badge.pm span { color: var(--accent-cyan); }
+        .history-badge.cm span { color: var(--accent-pink); }
+
+        /* History Table Panels */
+        .history-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .history-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .history-panel-title {
+            font-size: 0.88rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .history-panel-title.pm { color: var(--accent-cyan); }
+        .history-panel-title.cm { color: var(--accent-pink); }
+
+        .history-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-export-excel {
+            background: #107c41; /* Excel Green */
+            color: #ffffff;
+            border: none;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-export-excel:hover {
+            background: #0b5c30;
+        }
+
+        .history-table-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            table-layout: fixed;
+        }
+
+        .history-table-grid th {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 0.5rem 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            border: 1px solid var(--panel-border);
+            text-align: center;
+        }
+
+        .history-table-grid td {
+            padding: 0.5rem 0.6rem;
+            border: 1px solid var(--panel-border);
+            text-align: center;
+            vertical-align: middle;
+            word-wrap: break-word;
+        }
+
+        .history-nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--panel-border);
+            color: var(--text-primary);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .history-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Pending Repairs Card Grid */
+        .pending-repairs-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .pending-row-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .pending-type-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.6rem 0.85rem;
+            border-radius: 8px;
+            border: 1px solid var(--panel-border);
+        }
+
+        .pending-type-label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            width: 110px;
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+
+        .pending-cards-scroll {
+            display: flex;
+            gap: 0.6rem;
+            overflow-x: auto;
+            flex: 1;
+            padding-bottom: 2px;
+        }
+
+        .pending-item-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            padding: 0.45rem 0.75rem;
+            min-width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pending-item-card:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 211, 213, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .pending-card-date {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .pending-card-desc {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .no-pending-msg {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
         /* Modal Styling */
         .modal-overlay {
             position: fixed;
@@ -1123,7 +1379,6 @@
 <body>
 
     <div class="app-container">
-        <!-- LEFT SIDEBAR (15%) -->
         <aside class="sidebar">
             <div class="sidebar-top">
                 <div class="sidebar-brand">
@@ -1144,22 +1399,24 @@
                             <span>Reports & Analytics</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="#" class="menu-item" id="nav-item-history" onclick="switchTab('history', this)">
+                            <span class="icon">📜</span>
+                            <span>Equipment History</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
 
-            <!-- LIVE CLOCK WIDGET AT BOTTOM OF SIDEBAR -->
             <div class="sidebar-clock-container">
                 <span class="clock-label">Local Time</span>
                 <span class="clock-time" id="live-sidebar-clock">00:00:00 AM</span>
             </div>
         </aside>
 
-        <!-- RIGHT MAIN WRAPPER (85%) -->
         <div class="main-wrapper">
 
-            <!-- CATEGORY 1: EQUIPMENT REPAIR SCHEDULE -->
             <div id="view-schedule" class="tab-view active-view">
-                <!-- FIXED TOP HEADER -->
                 <header class="fixed-top-header">
                     <nav class="navbar">
                         <div class="navbar-title">
@@ -1214,7 +1471,6 @@
                     </div>
                 </header>
 
-                <!-- SCROLLABLE LOWER AREA -->
                 <main class="scrollable-content">
                     <div class="table-panel">
                         <div class="table-header-bar">
@@ -1222,6 +1478,9 @@
                                 📋 Equipment Repair Schedule
                             </div>
                             <div class="table-controls">
+                                <select class="control-select" id="unit-filter">
+                                    <option value="">All Units</option>
+                                </select>
                                 <select class="control-select" id="location-filter">
                                     <option value="">All Locations</option>
                                 </select>
@@ -1265,7 +1524,6 @@
                 </main>
             </div>
 
-            <!-- CATEGORY 2: REPORTS AND ANALYTICS MODULE -->
             <div id="view-analytics" class="tab-view">
                 <nav class="navbar">
                     <div class="navbar-title">
@@ -1274,7 +1532,6 @@
                 </nav>
 
                 <div class="analytics-container">
-                    <!-- KPI SUMMARY CARDS -->
                     <div class="kpi-grid">
                         <div class="kpi-card cyan">
                             <div class="kpi-header">
@@ -1313,7 +1570,6 @@
                         </div>
                     </div>
 
-                    <!-- TARGET BENCHMARK BANNER -->
                     <div class="target-config-banner">
                         <div class="target-config-title">
                             ⚙️ Target Compliance Threshold
@@ -1329,9 +1585,7 @@
                         </div>
                     </div>
 
-                    <!-- STACKED WEEKLY CHARTS SECTION (FULL-WIDTH) -->
                     <div class="weekly-charts-container">
-                        <!-- Chart 1: PM Weekly Trend -->
                         <div class="chart-card">
                             <div class="chart-header">
                                 <div class="chart-title">PM Weekly Compliance Trend <small style="font-size:0.7rem; color:var(--text-muted); text-transform:none;">(Click bar to view week)</small></div>
@@ -1347,7 +1601,6 @@
                             </div>
                         </div>
 
-                        <!-- Chart 2: CM Weekly Trend -->
                         <div class="chart-card">
                             <div class="chart-header">
                                 <div class="chart-title">CM Weekly Compliance Trend <small style="font-size:0.7rem; color:var(--text-muted); text-transform:none;">(Click bar to view week)</small></div>
@@ -1364,9 +1617,7 @@
                         </div>
                     </div>
 
-                    <!-- SIDE-BY-SIDE MONTHLY CHARTS SECTION -->
                     <div class="monthly-charts-container">
-                        <!-- Chart 3: PM Monthly Trend -->
                         <div class="chart-card">
                             <div class="chart-header">
                                 <div class="chart-title">PM Monthly Compliance Trend</div>
@@ -1382,7 +1633,6 @@
                             </div>
                         </div>
 
-                        <!-- Chart 4: CM Monthly Trend -->
                         <div class="chart-card">
                             <div class="chart-header">
                                 <div class="chart-title">CM Monthly Compliance Trend</div>
@@ -1401,10 +1651,124 @@
                 </div>
             </div>
 
+            <div id="view-history" class="tab-view">
+                <nav class="navbar">
+                    <div class="navbar-title">
+                        Equipment Maintenance History
+                    </div>
+                </nav>
+
+                <div class="history-container">
+                    <div class="history-top-bar">
+                        <div class="history-select-group">
+                            <span class="history-select-label">SELECT EQUIPMENT:</span>
+                            <select id="history-unit-select" class="history-unit-select" onchange="updateHistoryView()">
+                                <option value="">Select Equipment No.</option>
+                            </select>
+                        </div>
+                        <div class="history-badge-container">
+                            <div class="history-badge pm">
+                                TOTAL PM: <span id="history-total-pm">0</span>
+                            </div>
+                            <div class="history-badge cm">
+                                TOTAL CM: <span id="history-total-cm">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="history-panel">
+                        <div class="history-panel-header">
+                            <div class="history-panel-title pm">
+                                🛠️ PM HISTORY (PREVENTIVE MAINTENANCE)
+                            </div>
+                            <div class="history-controls">
+                                <button class="btn-export-excel" onclick="exportHistoryExcel('PM')">
+                                    📊 EXPORT EXCEL
+                                </button>
+                                <button class="history-nav-btn" id="pm-hist-prev" onclick="changeHistoryPage('PM', -1)">&lt; PREV</button>
+                                <button class="history-nav-btn" id="pm-hist-next" onclick="changeHistoryPage('PM', 1)">NEXT &gt;</button>
+                            </div>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="history-table-grid" id="pm-history-table">
+                                <thead>
+                                    <tr>
+                                        <th>DATE</th>
+                                        <th>REPAIR DESCRIPTION</th>
+                                        <th>DATE</th>
+                                        <th>REPAIR DESCRIPTION</th>
+                                        <th>DATE</th>
+                                        <th>REPAIR DESCRIPTION</th>
+                                        <th>DATE</th>
+                                        <th>REPAIR DESCRIPTION</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="8" class="empty-row">Select an equipment to view history</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="history-panel">
+                        <div class="history-panel-header">
+                            <div class="history-panel-title cm">
+                                ⚡ CM HISTORY (CORRECTIVE MAINTENANCE)
+                            </div>
+                            <div class="history-controls">
+                                <button class="btn-export-excel" onclick="exportHistoryExcel('CM')">
+                                    📊 EXPORT EXCEL
+                                </button>
+                                <button class="history-nav-btn" id="cm-hist-prev" onclick="changeHistoryPage('CM', -1)">&lt; PREV</button>
+                                <button class="history-nav-btn" id="cm-hist-next" onclick="changeHistoryPage('CM', 1)">NEXT &gt;</button>
+                            </div>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="history-table-grid" id="cm-history-table">
+                                <thead>
+                                    <tr>
+                                        <th>DATE</th>
+                                        <th>REPAIR DESCRIPTION</th>
+                                        <th>DATE</th>
+                                        <th>REPAIR DESCRIPTION</th>
+                                        <th>DATE</th>
+                                        <th>REPAIR DESCRIPTION</th>
+                                        <th>DATE</th>
+                                        <th>REPAIR DESCRIPTION</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="8" class="empty-row">Select an equipment to view history</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="pending-repairs-panel">
+                        <div class="history-panel-title" style="color: var(--accent-orange);">
+                            ⏳ PENDING REPAIRS (CLICK TASK TO UPDATE IN SCHEDULE)
+                        </div>
+                        <div class="pending-row-container">
+                            <div class="pending-type-row">
+                                <div class="pending-type-label" style="color: var(--accent-cyan);">PENDING PM</div>
+                                <div class="pending-cards-scroll" id="pending-pm-cards">
+                                    <span class="no-pending-msg">No pending PM tasks.</span>
+                                </div>
+                            </div>
+                            <div class="pending-type-row">
+                                <div class="pending-type-label" style="color: var(--accent-pink);">PENDING CM</div>
+                                <div class="pending-cards-scroll" id="pending-cm-cards">
+                                    <span class="no-pending-msg">No pending CM tasks.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- Update Equipment Modal -->
     <div id="update-modal" class="modal" style="display: none;">
         <div class="modal-header">UPDATE EQUIPMENT</div>
         <div class="modal-body">
@@ -1434,7 +1798,6 @@
     </div>
     <div id="modal-overlay" class="modal-overlay" style="display: none;" onclick="closeUpdateModal()"></div>
 
-    <!-- AI Chat Assistant Widget -->
     <button class="ai-chat-toggle" id="ai-chat-toggle" onclick="toggleAiChat()">👐</button>
     <div class="ai-chat-widget" id="ai-chat-widget">
         <div class="ai-chat-header">
@@ -1480,7 +1843,7 @@
             STATUS: 8,
             PIC: 9,
             REMARKS: 10,
-            REGION: 11 // Column L
+            REGION: 11
         };
 
         let parsedDataList = [];
@@ -1491,6 +1854,10 @@
         let pendingNewStatus = null;
         let analyticsCharts = {};
         let currentTargetBenchmark = 85;
+
+        /* History Module Pagination States */
+        let pmHistoryPage = 0;
+        let cmHistoryPage = 0;
 
         /* Live Clock Implementation */
         function startSidebarClock() {
@@ -1514,7 +1881,9 @@
             if (element) {
                 element.classList.add('active');
             } else {
-                const targetId = viewName === 'schedule' ? 'nav-item-schedule' : 'nav-item-analytics';
+                let targetId = 'nav-item-schedule';
+                if (viewName === 'analytics') targetId = 'nav-item-analytics';
+                if (viewName === 'history') targetId = 'nav-item-history';
                 document.getElementById(targetId)?.classList.add('active');
             }
 
@@ -1524,6 +1893,9 @@
             } else if (viewName === 'analytics') {
                 document.getElementById('view-analytics').classList.add('active-view');
                 renderAnalyticsCharts();
+            } else if (viewName === 'history') {
+                document.getElementById('view-history').classList.add('active-view');
+                updateHistoryView();
             }
         }
 
@@ -1551,7 +1923,6 @@
 
                 const data = await response.json();
 
-                // Object array format from Apps Script
                 if (data.length > 0 && data[0].unitNo !== undefined) {
                     return data.map((item, index) => ({
                         ...item,
@@ -1560,7 +1931,6 @@
                     }));
                 }
 
-                // Raw 2D Array format
                 const hasHeader = data.length > 0 && String(data[0][0]).toLowerCase().includes('unit');
                 const rows = hasHeader ? data.slice(1) : data;
 
@@ -1653,6 +2023,9 @@
                 if (document.getElementById('view-analytics').classList.contains('active-view')) {
                     renderAnalyticsCharts();
                 }
+                if (document.getElementById('view-history').classList.contains('active-view')) {
+                    updateHistoryView();
+                }
             } else {
                 document.getElementById('table-body').innerHTML = '<tr><td colspan="7" class="empty-row">No data available. Make sure your sheet has data and Apps Script is deployed.</td></tr>';
             }
@@ -1736,6 +2109,10 @@
 
             await updateRowInSheet(item);
             closeUpdateModal();
+
+            if (document.getElementById('view-history').classList.contains('active-view')) {
+                updateHistoryView();
+            }
         }
 
         async function updateRemarks(id, newRemarks) {
@@ -1805,6 +2182,7 @@
             const filters = getFilters();
             return parsedDataList.filter(item => {
                 if (filters.week && String(item.week) !== String(filters.week)) return false;
+                if (filters.unit && item.unitNo !== filters.unit) return false;
                 if (filters.location && item.location !== filters.location) return false;
                 if (filters.status && item.status.toLowerCase() !== filters.status.toLowerCase()) return false;
                 if (selectedRepairType && !item.repairType.toUpperCase().includes(selectedRepairType)) return false;
@@ -1815,6 +2193,7 @@
         function getFilters() {
             return {
                 week: document.getElementById('week-select').value,
+                unit: document.getElementById('unit-filter').value,
                 location: document.getElementById('location-filter').value,
                 status: document.getElementById('status-filter').value
             };
@@ -1822,6 +2201,7 @@
 
         function resetDisplay() {
             document.getElementById('week-select').value = '';
+            document.getElementById('unit-filter').value = '';
             document.getElementById('location-filter').value = '';
             document.getElementById('status-filter').value = '';
             setRepairTypeFilter('');
@@ -1842,6 +2222,7 @@
 
         function populateFilters() {
             const weeks = [...new Set(parsedDataList.map(r => r.week).filter(Boolean))].sort((a,b) => a - b);
+            const units = [...new Set(parsedDataList.map(r => r.unitNo).filter(Boolean))].sort();
             
             const locations = [...new Set(parsedDataList.map(r => r.location).filter(Boolean))]
                 .filter(loc => !/\b(hour|hours|hr|hrs|day|days)\b/i.test(loc)).sort();
@@ -1853,7 +2234,9 @@
             )].sort();
 
             populateSelect('week-select', weeks, 'Week ');
+            populateSelect('unit-filter', units);
             populateSelect('location-filter', locations);
+            populateSelect('history-unit-select', units);
 
             ['pmWeeklyRegion', 'cmWeeklyRegion', 'pmMonthlyRegion', 'cmMonthlyRegion'].forEach(id => {
                 const select = document.getElementById(id);
@@ -1875,6 +2258,7 @@
 
         function populateSelect(selectId, values, prefix = '') {
             const select = document.getElementById(selectId);
+            if (!select) return;
             while (select.options.length > 1) {
                 select.remove(1);
             }
@@ -1914,7 +2298,7 @@
                 const displayRemarks = isDone && !item.remarks ? `as per ${item.pic || 'Unknown'}` : item.remarks;
 
                 return `
-                    <tr>
+                    <tr id="schedule-row-${item.id}">
                         <td class="unit-cell">${item.unitNo}</td>
                         <td><span class="type-tag ${typeClass}">${item.repairType}</span></td>
                         <td class="desc-cell">${item.repairDesc}</td>
@@ -1981,7 +2365,7 @@
             a.click();
         }
 
-        /* --- REPORTS & ANALYTICS MODULE UPGRADES --- */
+        /* --- MODULE 2: ANALYTICS FUNCTIONS --- */
         function updateTargetBenchmark(val) {
             currentTargetBenchmark = parseInt(val, 10) || 85;
             document.getElementById('kpi-benchmark-text').textContent = `${currentTargetBenchmark}%`;
@@ -2102,8 +2486,8 @@
                             type: 'line',
                             label: 'Actual Compliance %',
                             data: [],
-                            borderColor: '#effd5f',
-                            backgroundColor: '#effd5f',
+                            borderColor: '#38bdf8',
+                            backgroundColor: '#38bdf8',
                             borderWidth: 3,
                             tension: 0.35,
                             yAxisID: 'y1',
@@ -2148,7 +2532,6 @@
                             const label = chart.data.labels[index];
                             const weekNum = label.replace('W', '');
                             
-                            // Drill down to main schedule with clicked week and repair type
                             setRepairTypeFilter(repairTypeFilter);
                             document.getElementById('week-select').value = weekNum;
                             updateTopHeaderInfo();
@@ -2233,6 +2616,177 @@
             }
         }
 
+        /* --- MODULE 3: EQUIPMENT HISTORY MODULE FUNCTIONS --- */
+
+        function updateHistoryView() {
+            const selectedUnit = document.getElementById('history-unit-select').value;
+            
+            if (!selectedUnit) {
+                document.getElementById('history-total-pm').textContent = '0';
+                document.getElementById('history-total-cm').textContent = '0';
+                document.getElementById('pm-history-table').querySelector('tbody').innerHTML = '<tr><td colspan="8" class="empty-row">Select an equipment to view history</td></tr>';
+                document.getElementById('cm-history-table').querySelector('tbody').innerHTML = '<tr><td colspan="8" class="empty-row">Select an equipment to view history</td></tr>';
+                document.getElementById('pending-pm-cards').innerHTML = '<span class="no-pending-msg">Select an equipment to view pending tasks.</span>';
+                document.getElementById('pending-cm-cards').innerHTML = '<span class="no-pending-msg">Select an equipment to view pending tasks.</span>';
+                return;
+            }
+
+            // Filter unit items
+            const unitItems = parsedDataList.filter(item => item.unitNo === selectedUnit);
+
+            // Completed PM & CM records
+            const completedPm = unitItems.filter(item => item.repairType.toUpperCase().includes('PM') && item.status.toLowerCase() === 'done');
+            const completedCm = unitItems.filter(item => item.repairType.toUpperCase().includes('CM') && item.status.toLowerCase() === 'done');
+
+            document.getElementById('history-total-pm').textContent = completedPm.length;
+            document.getElementById('history-total-cm').textContent = completedCm.length;
+
+            render4SetHistoryTable('PM', completedPm);
+            render4SetHistoryTable('CM', completedCm);
+            renderPendingRepairs(unitItems);
+        }
+
+        function changeHistoryPage(type, delta) {
+            if (type === 'PM') {
+                pmHistoryPage += delta;
+                if (pmHistoryPage < 0) pmHistoryPage = 0;
+            } else {
+                cmHistoryPage += delta;
+                if (cmHistoryPage < 0) cmHistoryPage = 0;
+            }
+            updateHistoryView();
+        }
+
+        function render4SetHistoryTable(type, items) {
+            const tableId = type === 'PM' ? 'pm-history-table' : 'cm-history-table';
+            const pageIndex = type === 'PM' ? pmHistoryPage : cmHistoryPage;
+            const prevBtn = document.getElementById(type === 'PM' ? 'pm-hist-prev' : 'cm-hist-prev');
+            const nextBtn = document.getElementById(type === 'PM' ? 'pm-hist-next' : 'cm-hist-next');
+
+            const tbody = document.getElementById(tableId).querySelector('tbody');
+            const totalItems = items.length;
+            const windowSize = 4; // 4 sets of Date + Description per row window
+
+            const maxPage = Math.max(0, Math.ceil(totalItems / windowSize) - 1);
+            
+            // Adjust current page if out of bounds
+            let safePage = Math.min(pageIndex, maxPage);
+            if (type === 'PM') pmHistoryPage = safePage; else cmHistoryPage = safePage;
+
+            prevBtn.disabled = safePage <= 0;
+            nextBtn.disabled = safePage >= maxPage;
+
+            if (totalItems === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="empty-row">No completed ${type} history recorded for this unit.</td></tr>`;
+                return;
+            }
+
+            const startIdx = safePage * windowSize;
+            const visibleSet = items.slice(startIdx, startIdx + windowSize);
+
+            let rowHtml = '<tr>';
+            for (let i = 0; i < 4; i++) {
+                if (i < visibleSet.length) {
+                    const rec = visibleSet[i];
+                    rowHtml += `
+                        <td style="font-weight:700; color:var(--accent-cyan);">${rec.dateStart || 'N/A'}</td>
+                        <td style="text-align:left;">${rec.repairDesc}</td>
+                    `;
+                } else {
+                    rowHtml += `<td style="color:var(--text-muted);">-</td><td style="color:var(--text-muted);">-</td>`;
+                }
+            }
+            rowHtml += '</tr>';
+
+            tbody.innerHTML = rowHtml;
+        }
+
+        function renderPendingRepairs(unitItems) {
+            const pendingPm = unitItems.filter(item => item.repairType.toUpperCase().includes('PM') && item.status.toLowerCase() !== 'done');
+            const pendingCm = unitItems.filter(item => item.repairType.toUpperCase().includes('CM') && item.status.toLowerCase() !== 'done');
+
+            const pmContainer = document.getElementById('pending-pm-cards');
+            const cmContainer = document.getElementById('pending-cm-cards');
+
+            if (pendingPm.length === 0) {
+                pmContainer.innerHTML = '<span class="no-pending-msg">No pending PM repairs for this equipment.</span>';
+            } else {
+                pmContainer.innerHTML = pendingPm.map(item => `
+                    <div class="pending-item-card" onclick="redirectToScheduleAndEdit(${item.id})">
+                        <span class="pending-card-date">${item.dateStart || 'Week ' + item.week}</span>
+                        <span class="pending-card-desc" title="${item.repairDesc}">${item.repairDesc}</span>
+                    </div>
+                `).join('');
+            }
+
+            if (pendingCm.length === 0) {
+                cmContainer.innerHTML = '<span class="no-pending-msg">No pending CM repairs for this equipment.</span>';
+            } else {
+                cmContainer.innerHTML = pendingCm.map(item => `
+                    <div class="pending-item-card" onclick="redirectToScheduleAndEdit(${item.id})">
+                        <span class="pending-card-date" style="color:var(--accent-pink);">${item.dateStart || 'Week ' + item.week}</span>
+                        <span class="pending-card-desc" title="${item.repairDesc}">${item.repairDesc}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function redirectToScheduleAndEdit(id) {
+            const item = parsedDataList.find(d => d.id === id);
+            if (!item) return;
+
+            // Switch to Schedule Tab
+            switchTab('schedule');
+
+            // Set Unit filter and status filter
+            document.getElementById('unit-filter').value = item.unitNo;
+            document.getElementById('status-filter').value = 'NOT DONE';
+            
+            currentPage = 1;
+            renderTable();
+
+            // Auto-trigger Update Modal for this item
+            pendingUpdateId = id;
+            pendingNewStatus = 'DONE';
+            showUpdateModal(item);
+        }
+
+        function exportHistoryExcel(type) {
+            const selectedUnit = document.getElementById('history-unit-select').value;
+            if (!selectedUnit) return;
+
+            const unitItems = parsedDataList.filter(item => item.unitNo === selectedUnit);
+            const historyData = unitItems.filter(item => 
+                item.repairType.toUpperCase().includes(type) && item.status.toLowerCase() === 'done'
+            );
+
+            if (historyData.length === 0) {
+                alert(`No completed ${type} history records to export for ${selectedUnit}.`);
+                return;
+            }
+
+            const headers = ['Unit No', 'Type', 'Date Start', 'Date End', 'Repair Description', 'Location', 'Remarks'];
+            const csvContent = [
+                headers.join(','),
+                ...historyData.map(item => [
+                    item.unitNo,
+                    item.repairType,
+                    item.dateStart,
+                    item.dateEnd,
+                    item.repairDesc,
+                    item.location,
+                    item.remarks
+                ].map(v => `"${v}"`).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${selectedUnit}_${type}_History_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
         /* AI Chatbot Functions */
         function toggleAiChat() {
             const widget = document.getElementById('ai-chat-widget');
@@ -2276,7 +2830,7 @@
             chatBody.innerHTML = '';
             const bubble = document.createElement('div');
             bubble.className = 'chat-bubble bot';
-            bubble.textContent = 'Chat cleared! 👐 How can I help you today?';
+            bubble.textContent = 'How can I help you today?';
             chatBody.appendChild(bubble);
         }
 
@@ -2338,7 +2892,7 @@
                     renderTable();
                 });
 
-                ['location-filter', 'status-filter'].forEach(id => {
+                ['unit-filter', 'location-filter', 'status-filter'].forEach(id => {
                     document.getElementById(id).addEventListener('change', () => {
                         currentPage = 1;
                         renderTable();
